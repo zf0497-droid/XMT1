@@ -1,0 +1,171 @@
+{
+  "projectName": "XMT新媒体智能生产系统",
+  "scenario": "MCN批量生产系统",
+  "targetUsers": "内容工厂（10-50人团队）",
+  "scale": {
+    "dailyVideoOutput": "100-500条",
+    "concurrentUsers": "10-30人",
+    "peakRenderingConcurrency": "20-50个任务"
+  },
+  "mvpFeatures": [
+    {
+      "priority": 1,
+      "feature": "视频模板库",
+      "description": "预设多种视频模板（口播、图文、混剪等），支持参数化配置（文案、素材、时长）",
+      "technicalRequirements": [
+        "基于Remotion组件的模板系统",
+        "JSON驱动的模板配置",
+        "模板预览和管理界面"
+      ]
+    },
+    {
+      "priority": 2,
+      "feature": "批量渲染引擎",
+      "description": "支持批量提交渲染任务，队列管理，进度追踪",
+      "technicalRequirements": [
+        "渲染任务队列（Redis/Bull）",
+        "本地渲染优先（@remotion/renderer）",
+        "云端渲染兜底（阿里云函数计算/腾讯云SCF）",
+        "失败重试机制",
+        "渲染进度实时反馈"
+      ]
+    },
+    {
+      "priority": 3,
+      "feature": "多平台自动分发",
+      "description": "一键发布到抖音、视频号、小红书、快手等平台",
+      "technicalRequirements": [
+        "平台API集成（抖音开放平台、微信视频号、小红书开放平台、快手开放平台）",
+        "格式自动适配（9:16竖屏、16:9横屏、1:1方形）",
+        "发布队列和状态追踪",
+        "账号管理和授权"
+      ]
+    }
+  ],
+  "platformPriority": [
+    {
+      "rank": 1,
+      "platform": "抖音",
+      "apiStatus": "需确认企业认证和API权限",
+      "formatRequirements": "9:16竖屏，时长15s-3min，H.264编码",
+      "apiDoc": "https://developer.open-douyin.com/"
+    },
+    {
+      "rank": 2,
+      "platform": "视频号",
+      "apiStatus": "需公众号关联",
+      "formatRequirements": "9:16或16:9，时长1s-30min",
+      "apiDoc": "https://developers.weixin.qq.com/doc/channels/API/"
+    },
+    {
+      "rank": 3,
+      "platform": "小红书",
+      "apiStatus": "需企业认证和开放平台权限",
+      "formatRequirements": "9:16竖屏或1:1方形，时长3s-15min",
+      "apiDoc": "https://open.xiaohongshu.com/"
+    },
+    {
+      "rank": 4,
+      "platform": "快手",
+      "apiStatus": "需确认开放平台权限",
+      "formatRequirements": "9:16竖屏，时长15s-5min",
+      "apiDoc": "https://open.kuaishou.com/"
+    }
+  ],
+  "contentTypes": [
+    "口播类（真人出镜+字幕）",
+    "图文成片（图片轮播+配音）",
+    "混剪视频（素材拼接+转场）",
+    "带货短视频（产品展示+文案）"
+  ],
+  "aiCapabilities": {
+    "phase1": [
+      "AI文案生成（通义千问/文心一言/豆包）",
+      "AI配音（阿里云TTS/腾讯云TTS/火山引擎TTS）",
+      "自动字幕（阿里云语音识别/腾讯云ASR）"
+    ],
+    "phase2": [
+      "智能剪辑（自动识别精彩片段）",
+      "智能配乐（情绪匹配）",
+      "封面生成（AI抠图+文字）"
+    ]
+  },
+  "existingEditorRole": "高级编辑工具",
+  "existingEditorUsage": "普通用户使用模板快速生产，高级用户使用编辑器精细调整",
+  "architectureDecisions": {
+    "backend": {
+      "framework": "Node.js + Next.js API Routes",
+      "database": "PostgreSQL（关系数据） + Redis（队列和缓存）",
+      "storage": "本地存储优先，阿里云OSS/腾讯云COS兜底",
+      "rendering": "本地渲染优先（@remotion/renderer），阿里云函数计算/腾讯云SCF兜底"
+    },
+    "frontend": {
+      "framework": "Next.js 15（复用现有编辑器）",
+      "stateManagement": "Zustand（已有）",
+      "uiLibrary": "Radix UI + Tailwind CSS（已有）"
+    },
+    "authentication": "JWT + OAuth2（支持企业SSO）",
+    "monitoring": "Sentry（已集成） + 自建日志系统"
+  },
+  "keyRisks": [
+    {
+      "risk": "平台API限流和政策变化",
+      "mitigation": "多平台分散风险，本地缓存发布队列"
+    },
+    {
+      "risk": "云端渲染成本失控",
+      "mitigation": "本地渲染优先，云端仅作兜底；设置并发上限，实施成本监控告警"
+    },
+    {
+      "risk": "AI调用成本高",
+      "mitigation": "缓存常用文案，提供人工编辑选项"
+    },
+    {
+      "risk": "批量发布触发平台反作弊",
+      "mitigation": "随机延迟发布，模拟人工操作"
+    }
+  ],
+  "developmentResources": {
+    "teamSize": "待确认",
+    "timeline": "待确认",
+    "budget": "待确认"
+  },
+  "differentiationValue": [
+    "成本优势：自建渲染比SaaS便宜50%+",
+    "流程自动化：从模板到发布全链路自动化",
+    "数据掌控：用户数据和内容完全自主",
+    "深度定制：可根据MCN特殊需求定制功能"
+  ],
+  "phaseRoadmap": {
+    "phase1_mvp": {
+      "duration": "2-3个月",
+      "features": [
+        "5-10个基础模板",
+        "单平台发布（抖音）",
+        "基础批量渲染（10并发）",
+        "简单用户管理"
+      ]
+    },
+    "phase2_scale": {
+      "duration": "3-4个月",
+      "features": [
+        "20+模板库",
+        "4平台发布（抖音、视频号、小红书、快手）",
+        "高并发渲染（50+）",
+        "AI文案/配音集成",
+        "数据看板"
+      ]
+    },
+    "phase3_intelligence": {
+      "duration": "4-6个月",
+      "features": [
+        "智能剪辑",
+        "A/B测试",
+        "爆款分析",
+        "团队协作和权限"
+      ]
+    }
+  },
+  "createdAt": "2026-04-01T09:00:00Z",
+  "status": "需求确认完成，待进入架构设计"
+}

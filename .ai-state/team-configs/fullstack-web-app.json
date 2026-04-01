@@ -1,0 +1,87 @@
+{
+  "projectType": "fullstack-web-app",
+  "description": "全栈Web应用（前端+后端+数据库+云服务）",
+  "recommendedTeam": {
+    "coreRoles": [
+      {
+        "role": "全栈架构师",
+        "responsibility": "系统架构设计、技术选型、核心模块开发",
+        "skills": ["系统设计", "前后端技术栈", "数据库设计", "云服务"],
+        "priority": 1
+      },
+      {
+        "role": "前端工程师",
+        "responsibility": "UI/UX实现、组件开发、状态管理",
+        "skills": ["React/Next.js", "TypeScript", "Tailwind CSS", "Zustand"],
+        "priority": 2
+      },
+      {
+        "role": "后端工程师",
+        "responsibility": "API开发、业务逻辑、数据库操作、任务队列",
+        "skills": ["Node.js/Python", "RESTful API", "PostgreSQL", "Redis"],
+        "priority": 2
+      }
+    ],
+    "specializedRoles": [
+      {
+        "role": "视频渲染工程师",
+        "responsibility": "Remotion模板开发、渲染优化、Lambda配置",
+        "skills": ["Remotion", "AWS Lambda", "视频编解码"],
+        "priority": 3,
+        "note": "可由全栈架构师兼任"
+      },
+      {
+        "role": "平台集成工程师",
+        "responsibility": "第三方平台API对接、OAuth认证、发布流程",
+        "skills": ["平台API", "OAuth2", "异步任务"],
+        "priority": 3,
+        "note": "可由后端工程师兼任"
+      }
+    ],
+    "optionalRoles": [
+      {
+        "role": "AI工程师",
+        "responsibility": "AI文案生成、配音、字幕集成",
+        "skills": ["OpenAI API", "TTS", "Whisper"],
+        "priority": 4,
+        "phase": "Phase 2"
+      },
+      {
+        "role": "DevOps工程师",
+        "responsibility": "CI/CD、监控、日志、成本优化",
+        "skills": ["Docker", "AWS", "监控系统"],
+        "priority": 4,
+        "phase": "Phase 2"
+      }
+    ]
+  },
+  "minimalTeam": {
+    "size": "1-2人",
+    "composition": [
+      "1个全栈架构师（兼任前后端+渲染）",
+      "可选：1个前端或后端工程师（加速开发）"
+    ],
+    "适用场景": "MVP快速验证、小团队、预算有限"
+  },
+  "standardTeam": {
+    "size": "3-4人",
+    "composition": [
+      "1个全栈架构师",
+      "1个前端工程师",
+      "1个后端工程师",
+      "可选：1个平台集成工程师"
+    ],
+    "适用场景": "正式产品开发、中等规模团队"
+  },
+  "fullTeam": {
+    "size": "5-7人",
+    "composition": [
+      "1个全栈架构师",
+      "2个前端工程师",
+      "2个后端工程师",
+      "1个AI工程师",
+      "1个DevOps工程师"
+    ],
+    "适用场景": "大规模生产、快速迭代、完整功能"
+  }
+}
