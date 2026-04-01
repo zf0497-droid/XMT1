@@ -364,8 +364,6 @@ export const zhCN = {
     continue: '知道了，继续！',
     noShowAgain: '此消息不会再次显示',
   },
-    fileTooLarge: '文件过大',
-  },
 
   // 成功消息
   success: {
