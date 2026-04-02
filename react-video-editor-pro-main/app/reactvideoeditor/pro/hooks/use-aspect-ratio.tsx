@@ -1,6 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
 import { AspectRatio } from "../types";
-import { getDimensionsForAspectRatio } from "../utils/aspect-ratio-transform";
+import {
+  getDimensionsForAspectRatio,
+  aspectRatioToNumeric,
+} from "../utils/aspect-ratio-transform";
 
 /**
  * Custom hook for managing aspect ratio and player dimensions.
@@ -45,15 +48,7 @@ export const useAspectRatio = (
     (containerWidth: number, containerHeight: number) => {
       let width, height;
 
-      // Calculate target aspect ratio
-      const targetRatio =
-        aspectRatio === "16:9"
-          ? 16 / 9
-          : aspectRatio === "9:16"
-          ? 9 / 16
-          : aspectRatio === "1:1"
-          ? 1
-          : 4 / 5;
+      const targetRatio = aspectRatioToNumeric(aspectRatio);
 
       // Compare container ratio with target ratio to determine fitting strategy
       const containerRatio = containerWidth / containerHeight;

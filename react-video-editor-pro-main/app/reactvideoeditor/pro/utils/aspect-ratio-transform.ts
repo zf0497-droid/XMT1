@@ -11,6 +11,25 @@ export interface CanvasDimensions {
   height: number;
 }
 
+/** 将 "16:9" 等形式转为数值宽高比（宽/高） */
+export function aspectRatioToNumeric(ratio: AspectRatio): number {
+  const [w, h] = ratio.split(":").map(Number);
+  return w / h;
+}
+
+/**
+ * 成片编码用分辨率：H.264 4:2:0 要求宽高为偶数；部分硬件编码对奇数尺寸会失败。
+ * 与 Remotion 内部 validateEvenDimensions 对齐，在 SSR 入口统一收敛，避免任意比例导出失败。
+ */
+export function normalizeDimensionsForVideoEncode(
+  width: number,
+  height: number
+): { width: number; height: number } {
+  const w = Math.max(2, Math.floor(width / 2) * 2);
+  const h = Math.max(2, Math.floor(height / 2) * 2);
+  return { width: w, height: h };
+}
+
 /**
  * Get canvas dimensions for a specific aspect ratio
  * @param aspectRatio - The aspect ratio to get dimensions for
@@ -20,14 +39,16 @@ export function getDimensionsForAspectRatio(aspectRatio: AspectRatio): CanvasDim
   switch (aspectRatio) {
     case "9:16":
       return { width: 1080, height: 1920 };
+    case "3:4":
+      return { width: 1080, height: 1440 };
     case "4:5":
       return { width: 1080, height: 1350 };
     case "1:1":
       return { width: 1080, height: 1080 };
+    case "4:3":
+      return { width: 1440, height: 1080 };
     case "16:9":
       return { width: 1280, height: 720 };
-    default:
-      return { width: 1920, height: 1080 };
   }
 }
 

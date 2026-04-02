@@ -15,6 +15,11 @@ import {
   failRender,
 } from "./render-state";
 import { getBaseUrl } from "../../../../reactvideoeditor/pro/utils/general/url-helper";
+import {
+  normalizeDimensionsForVideoEncode,
+  getDimensionsForAspectRatio,
+} from "../../../../reactvideoeditor/pro/utils/aspect-ratio-transform";
+import type { AspectRatio } from "../../../../reactvideoeditor/pro/types";
 import type { RenderQualityPreset } from "../../../../reactvideoeditor/pro/types/renderer";
 import type { X264Preset } from "@remotion/renderer";
 
@@ -163,12 +168,51 @@ export async function startRendering(
       // Get the base URL for serving media files
       const baseUrl = getBaseUrl();
 
-      /** Main 组件在 SSR 下仍需要这些字段；与 root 默认 props 对齐，避免 undefined 崩溃 */
+      const raw = inputProps as Record<string, unknown>;
+      const rawW = Number(raw.width);
+      const rawH = Number(raw.height);
+      const arRaw = raw.aspectRatio;
+      const aspectRatio =
+        typeof arRaw === "string" ? (arRaw as AspectRatio) : undefined;
+      const allowed: AspectRatio[] = [
+        "16:9",
+        "4:3",
+        "1:1",
+        "4:5",
+        "9:16",
+        "3:4",
+      ];
+      const safeAspect =
+        aspectRatio && allowed.includes(aspectRatio) ? aspectRatio : undefined;
+
+      let baseW =
+        Number.isFinite(rawW) && rawW > 0 ? rawW : Number.NaN;
+      let baseH =
+        Number.isFinite(rawH) && rawH > 0 ? rawH : Number.NaN;
+      if (!Number.isFinite(baseW) || !Number.isFinite(baseH)) {
+        if (safeAspect) {
+          const d = getDimensionsForAspectRatio(safeAspect);
+          baseW = d.width;
+          baseH = d.height;
+        } else {
+          baseW = 1280;
+          baseH = 720;
+        }
+      }
+
+      const { width: encW, height: encH } = normalizeDimensionsForVideoEncode(
+        baseW,
+        baseH
+      );
+
+      /** Main 与成片编码使用同一套宽高（偶数对齐），任意预设比例均可稳定导出 */
       const mergedInputProps = {
         setSelectedOverlayId: () => {},
         changeOverlay: () => {},
         selectedOverlayId: null as number | null,
         ...inputProps,
+        width: encW,
+        height: encH,
         baseUrl,
       };
 
@@ -191,10 +235,9 @@ export async function startRendering(
       // Get the actual duration from inputProps or use composition's duration
       const actualDurationInFrames =
         (inputProps.durationInFrames as number) || composition.durationInFrames;
-      
-      // Get the actual dimensions from inputProps or use composition's dimensions
-      const actualWidth = (inputProps.width as number) || composition.width;
-      const actualHeight = (inputProps.height as number) || composition.height;
+
+      const actualWidth = encW;
+      const actualHeight = encH;
 
       const videoBitrate = videoBitrateForResolution(
         row.baseBitrateMbps,
@@ -207,8 +250,15 @@ export async function startRendering(
       
       console.log(`Using actual duration: ${actualDurationInFrames} frames`);
       console.log(`Using actual dimensions: ${actualWidth}x${actualHeight}`);
+      const hardwareAcceleration =
+        process.env.REMOTION_DISABLE_HW_ACCEL === "true"
+          ? ("disable" as const)
+          : ("if-possible" as const);
+      const x264PresetResolved =
+        hardwareAcceleration === "disable" ? row.x264Preset : x264Preset;
+
       console.log(
-        `[Remotion SSR] Encode: videoBitrate=${videoBitrate} x264Preset=${x264Preset ?? "(darwin HW / default)"} imageFormat=${row.imageFormat} hardwareAcceleration=if-possible`
+        `[Remotion SSR] Encode: videoBitrate=${videoBitrate} x264Preset=${x264PresetResolved ?? "(darwin HW / default)"} imageFormat=${row.imageFormat} hardwareAcceleration=${hardwareAcceleration}`
       );
 
       // Render the video using chromium
@@ -242,8 +292,8 @@ export async function startRendering(
         videoBitrate,
         imageFormat: row.imageFormat,
         colorSpace: "bt709",
-        x264Preset,
-        hardwareAcceleration: "if-possible",
+        x264Preset: x264PresetResolved,
+        hardwareAcceleration,
         ...(row.imageFormat === "jpeg"
           ? { jpegQuality: row.jpegQuality }
           : {}),

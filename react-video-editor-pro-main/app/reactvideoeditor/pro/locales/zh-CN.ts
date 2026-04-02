@@ -500,6 +500,23 @@ export const zhCN = {
     hueRotate: '色相旋转',
   },
 
+  // 画布比例下拉（时间轴头部，与 AspectRatio 类型一一对应）
+  canvasAspectRatio: {
+    title: '画面比例',
+    /** value 为 AspectRatio 字符串 */
+    description: {
+      '16:9': '横屏宽屏',
+      '4:3': '标准横屏',
+      '1:1': '正方形',
+      '4:5': '竖版（4:5）',
+      '9:16': '竖屏全屏',
+      '3:4': '标准竖屏',
+    } as Record<
+      '16:9' | '4:3' | '1:1' | '4:5' | '9:16' | '3:4',
+      string
+    >,
+  },
+
   // 错误消息
   errors: {
     uploadFailed: '上传失败',

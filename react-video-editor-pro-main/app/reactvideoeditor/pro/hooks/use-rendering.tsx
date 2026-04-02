@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CompositionProps } from "../types";
 import { useRenderer } from "../contexts/renderer-context";
 import type { RenderQualityPreset } from "../types/renderer";
@@ -69,7 +69,14 @@ export const useRendering = (
   inputProps: z.infer<typeof CompositionProps>
 ) => {
   const rendererConfig = useRenderer();
-  
+  /** 避免 useCallback 依赖 state.status 时闭包拿到过期的 width/height */
+  const inputPropsRef = useRef(inputProps);
+  useEffect(() => {
+    inputPropsRef.current = inputProps;
+  }, [inputProps]);
+
+  const renderInFlightRef = useRef(false);
+
   // Maintain current state of the rendering process
   const [state, setState] = useState<State>({
     status: "init",
@@ -77,12 +84,12 @@ export const useRendering = (
 
   // Main function to handle the rendering process
   const renderMedia = useCallback(async (qualityPreset?: RenderQualityPreset) => {
-    // Prevent multiple concurrent renders
-    if (state.status === "invoking" || state.status === "rendering") {
-      console.log(`Render already in progress, ignoring new render request. Current status: ${state.status}`);
+    if (renderInFlightRef.current) {
+      console.log("Render already in progress, ignoring new render request.");
       return;
     }
-    
+    renderInFlightRef.current = true;
+
     console.log(`Starting renderMedia process`, qualityPreset);
     setState({
       status: "invoking",
@@ -91,10 +98,11 @@ export const useRendering = (
     try {
       const { renderer, pollingInterval = 1000, initialDelay = 0 } = rendererConfig;
 
-      console.log("Calling renderVideo with inputProps", inputProps);
+      const latestInputProps = inputPropsRef.current;
+      console.log("Calling renderVideo with inputProps", latestInputProps);
       const response = await renderer.renderVideo({
         id,
-        inputProps,
+        inputProps: latestInputProps,
         ...(qualityPreset !== undefined && { qualityPreset }),
       });
       const renderId = response?.renderId;
@@ -182,8 +190,10 @@ export const useRendering = (
         error: err as Error,
         renderId: null,
       });
+    } finally {
+      renderInFlightRef.current = false;
     }
-  }, [id, inputProps, rendererConfig, state.status]);
+  }, [id, rendererConfig]);
 
   // Reset the rendering state back to initial
   const undo = useCallback(() => {

@@ -44,11 +44,19 @@ export const Root: React.FC = () => {
          * @param props - The composition props passed to the component
          * @returns An object containing the video dimensions and duration
          */
-        calculateMetadata={async ({ props }) => {
+        calculateMetadata={async ({ props, defaultProps }) => {
+          const width =
+            typeof props.width === "number" && props.width > 0
+              ? props.width
+              : defaultProps.width;
+          const height =
+            typeof props.height === "number" && props.height > 0
+              ? props.height
+              : defaultProps.height;
           return {
             durationInFrames: props.durationInFrames,
-            width: props.width,
-            height: props.height,
+            width,
+            height,
           };
         }}
         defaultProps={defaultProps}

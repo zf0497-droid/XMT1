@@ -3,6 +3,7 @@ import {
   transformOverlaysForAspectRatio,
   shouldTransformOverlays,
   getDimensionsForAspectRatio,
+  normalizeDimensionsForVideoEncode,
   CanvasDimensions,
 } from "../../app/reactvideoeditor/pro/utils/aspect-ratio-transform";
 import { Overlay, OverlayType } from "../../app/reactvideoeditor/pro/types";
@@ -34,6 +35,36 @@ describe("aspect-ratio-transform", () => {
       expect(getDimensionsForAspectRatio("4:5")).toEqual({
         width: 1080,
         height: 1350,
+      });
+    });
+
+    it("should return correct dimensions for 4:3", () => {
+      expect(getDimensionsForAspectRatio("4:3")).toEqual({
+        width: 1440,
+        height: 1080,
+      });
+    });
+
+    it("should return correct dimensions for 3:4", () => {
+      expect(getDimensionsForAspectRatio("3:4")).toEqual({
+        width: 1080,
+        height: 1440,
+      });
+    });
+  });
+
+  describe("normalizeDimensionsForVideoEncode", () => {
+    it("rounds odd dimensions down to even", () => {
+      expect(normalizeDimensionsForVideoEncode(1441, 1079)).toEqual({
+        width: 1440,
+        height: 1078,
+      });
+    });
+
+    it("leaves already-even dimensions unchanged", () => {
+      expect(normalizeDimensionsForVideoEncode(1440, 1080)).toEqual({
+        width: 1440,
+        height: 1080,
       });
     });
   });

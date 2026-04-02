@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import { EditorProvider as EditorContextProvider, EditorContextProps } from "../../contexts/editor-context";
 import { useOverlays } from "../../hooks/use-overlays";
 import { useVideoPlayer } from "../../hooks/use-video-player";
@@ -221,19 +227,33 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   // Get dynamic dimensions based on current aspect ratio
   const { width: dynamicWidth, height: dynamicHeight } = getAspectRatioDimensions();
 
-  // Set up rendering functionality
-  const { renderMedia: triggerRender, state: renderState } = useRendering(
-    COMP_NAME, // Remotion bundle 里的 Composition id，需与 root.tsx 一致
-    {
+  /** 导出参数与当前画布一致；useMemo 避免无意义引用变化导致渲染回调抖动 */
+  const renderCompositionInputProps = useMemo(
+    () => ({
       overlays,
       durationInFrames,
       fps,
       width: dynamicWidth,
       height: dynamicHeight,
-      src: "", // Base video src if any
-      // Note: selectedOverlayId and baseUrl are not part of CompositionProps
-      // They are editor state, not render parameters
-    }
+      aspectRatio,
+      src: "" as string,
+      backgroundColor,
+    }),
+    [
+      overlays,
+      durationInFrames,
+      fps,
+      dynamicWidth,
+      dynamicHeight,
+      aspectRatio,
+      backgroundColor,
+    ]
+  );
+
+  // Set up rendering functionality
+  const { renderMedia: triggerRender, state: renderState } = useRendering(
+    COMP_NAME, // Remotion bundle 里的 Composition id，需与 root.tsx 一致
+    renderCompositionInputProps
   );
 
   // State for general editor state - separate from render state to prevent unnecessary re-renders

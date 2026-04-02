@@ -341,6 +341,15 @@ export type SelectedItem = TimelineItemUnion | null;
 
 // Zod schema for composition props
 
+const aspectRatioEnum = z.enum([
+  "16:9",
+  "4:3",
+  "1:1",
+  "4:5",
+  "9:16",
+  "3:4",
+]);
+
 export const CompositionProps = z.object({
   overlays: z.array(z.any()), // Replace with your actual Overlay type
   durationInFrames: z.number(),
@@ -348,6 +357,11 @@ export const CompositionProps = z.object({
   height: z.number(),
   fps: z.number(),
   src: z.string(),
+  /** 与当前画布比例一致；服务端在宽高异常时可据此回退 */
+  aspectRatio: aspectRatioEnum.optional(),
+  /** 与编辑器画布一致，导出时传给 Remotion Main */
+  backgroundColor: z.string().optional(),
+  fontInfos: z.record(z.any()).optional(),
 });
 
 // Other types remain the same
@@ -398,7 +412,7 @@ export type LocalClip = {
   videoUrl: string;
 };
 
-export type AspectRatio = "16:9" | "1:1" | "4:5" | "9:16";
+export type AspectRatio = "16:9" | "4:3" | "1:1" | "4:5" | "9:16" | "3:4";
 
 export interface TimelineRow {
   id: number;

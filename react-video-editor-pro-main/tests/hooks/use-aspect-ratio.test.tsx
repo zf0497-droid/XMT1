@@ -302,6 +302,24 @@ describe("useAspectRatio", () => {
       });
     });
 
+    it("should return standard dimensions for 4:3", () => {
+      const { result } = renderHook(() => useAspectRatio("4:3"));
+
+      expect(result.current.getAspectRatioDimensions()).toEqual({
+        width: 1440,
+        height: 1080,
+      });
+    });
+
+    it("should return standard dimensions for 3:4", () => {
+      const { result } = renderHook(() => useAspectRatio("3:4"));
+
+      expect(result.current.getAspectRatioDimensions()).toEqual({
+        width: 1080,
+        height: 1440,
+      });
+    });
+
     it("should update returned dimensions when aspect ratio changes", () => {
       const { result } = renderHook(() => useAspectRatio("16:9"));
 
@@ -366,7 +384,14 @@ describe("useAspectRatio", () => {
     it("should maintain state consistency across multiple operations", () => {
       const { result } = renderHook(() => useAspectRatio("16:9"));
 
-      const ratios: AspectRatio[] = ["16:9", "9:16", "1:1", "4:5"];
+      const ratios: AspectRatio[] = [
+        "16:9",
+        "4:3",
+        "1:1",
+        "4:5",
+        "9:16",
+        "3:4",
+      ];
 
       ratios.forEach((ratio) => {
         act(() => {

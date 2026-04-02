@@ -17,6 +17,9 @@ const RenderRequest = z.object({
       fps: z.number(),
       width: z.number(),
       height: z.number(),
+      aspectRatio: z
+        .enum(["16:9", "4:3", "1:1", "4:5", "9:16", "3:4"])
+        .optional(),
       src: z.string().optional(),
       selectedOverlayId: z.number().nullable().optional(),
       setSelectedOverlayId: z.any().optional(),
