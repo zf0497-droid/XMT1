@@ -25,9 +25,9 @@ export const StickerStylesPanel: React.FC<StickerStylesPanelProps> = ({
     <div className="space-y-2">
   
   <Alert variant="default">
-  <AlertTitle>Sticker Stykes</AlertTitle>
+  <AlertTitle>贴纸样式</AlertTitle>
   <AlertDescription>
-    Soon you will be able to customize your sticker styles here.
+    后续将可在此自定义贴纸样式。
   </AlertDescription>
 </Alert>
 

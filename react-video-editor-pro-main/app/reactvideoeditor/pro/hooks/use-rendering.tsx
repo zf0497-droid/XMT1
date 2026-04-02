@@ -2,6 +2,7 @@ import { z } from "zod";
 import { useCallback, useMemo, useState } from "react";
 import { CompositionProps } from "../types";
 import { useRenderer } from "../contexts/renderer-context";
+import type { RenderQualityPreset } from "../types/renderer";
 
 // Define possible states for the rendering process
 export type State =
@@ -54,8 +55,8 @@ const wait = async (milliSeconds: number) => {
  *   src: "video.mp4"
  * });
  * 
- * // Start rendering
- * await renderMedia();
+ * // Start rendering（可选画质）
+ * await renderMedia("balanced");
  * 
  * // Check state
  * if (state.status === "done") {
@@ -75,14 +76,14 @@ export const useRendering = (
   });
 
   // Main function to handle the rendering process
-  const renderMedia = useCallback(async () => {
+  const renderMedia = useCallback(async (qualityPreset?: RenderQualityPreset) => {
     // Prevent multiple concurrent renders
     if (state.status === "invoking" || state.status === "rendering") {
       console.log(`Render already in progress, ignoring new render request. Current status: ${state.status}`);
       return;
     }
     
-    console.log(`Starting renderMedia process`);
+    console.log(`Starting renderMedia process`, qualityPreset);
     setState({
       status: "invoking",
     });
@@ -91,8 +92,15 @@ export const useRendering = (
       const { renderer, pollingInterval = 1000, initialDelay = 0 } = rendererConfig;
 
       console.log("Calling renderVideo with inputProps", inputProps);
-      const response = await renderer.renderVideo({ id, inputProps });
-      const renderId = response.renderId;
+      const response = await renderer.renderVideo({
+        id,
+        inputProps,
+        ...(qualityPreset !== undefined && { qualityPreset }),
+      });
+      const renderId = response?.renderId;
+      if (!renderId || typeof renderId !== "string") {
+        throw new Error("服务器未返回有效的渲染任务编号，请稍后重试。");
+      }
       const bucketName = response.bucketName;
 
       // Apply initial delay if configured
@@ -107,8 +115,8 @@ export const useRendering = (
         ...(bucketName && { bucketName }),
       });
 
-      // Wait a short moment before first progress check to allow async render process to initialize
-      await wait(100);
+      // 极短等待，让服务端写入 render state；进度轮询间隔见 RendererProvider.pollingInterval
+      await wait(50);
 
       let pending = true;
 
@@ -153,6 +161,16 @@ export const useRendering = (
               ...(bucketName && { bucketName }),
             });
             await wait(pollingInterval);
+            break;
+          }
+          default: {
+            console.error("Unexpected progress response:", result);
+            setState({
+              status: "error",
+              renderId,
+              error: new Error("进度数据格式异常，请重试。"),
+            });
+            pending = false;
             break;
           }
         }

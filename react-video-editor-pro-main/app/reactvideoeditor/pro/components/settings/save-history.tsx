@@ -4,6 +4,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Card, CardContent } from "../ui/card";
 import { Trash2, RefreshCw, Download, FileVideo2, Loader2 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
+import { zhCN as dateFnsZhCN } from "date-fns/locale";
 import { getAllAutosaves, clearAutosave } from "../../utils/general/indexdb-helper";
 import { useEditorContext } from "../../contexts/editor-context";
 import { t } from "../../locales";
@@ -34,7 +35,7 @@ export const SaveHistory: React.FC = () => {
       const records = await getAllAutosaves();
       setSaveRecords(records);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load save history');
+      setError(err instanceof Error ? err.message : t.settings.loadHistoryFailed);
       console.error('Error loading save history:', err);
     } finally {
       setLoading(false);
@@ -59,7 +60,7 @@ export const SaveHistory: React.FC = () => {
       console.log('Loaded save from:', new Date(record.timestamp));
     } catch (err) {
       console.error('Error loading save:', err);
-      setError('Failed to load save');
+      setError(t.settings.loadSaveFailed);
     }
   };
 
@@ -69,7 +70,7 @@ export const SaveHistory: React.FC = () => {
       await loadSaveHistory();
     } catch (err) {
       console.error('Error deleting save:', err);
-      setError('Failed to delete save');
+      setError(t.settings.deleteSaveFailed);
     }
   };
 
@@ -79,7 +80,7 @@ export const SaveHistory: React.FC = () => {
       await loadSaveHistory();
     } catch (err) {
       console.error('Error clearing all saves:', err);
-      setError('Failed to clear all saves');
+      setError(t.settings.clearAllFailed);
     }
   };
 
@@ -90,11 +91,13 @@ export const SaveHistory: React.FC = () => {
     
     // For recent saves, use relative time
     if (diffInHours < 24) {
-      return formatDistanceToNow(date, { addSuffix: true });
+      return formatDistanceToNow(date, {
+        addSuffix: true,
+        locale: dateFnsZhCN,
+      });
     }
-    
-    // For older saves, use formatted date
-    return format(date, 'MMM d, h:mm a');
+
+    return format(date, "yyyy年M月d日 HH:mm", { locale: dateFnsZhCN });
   };
 
   // Load save history on component mount
@@ -178,7 +181,7 @@ export const SaveHistory: React.FC = () => {
                 {saveRecords.map((record) => (
                   <tr key={`${record.id}-${record.timestamp}`} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                     <td className="px-3 py-2.5">
-                      {record.editorState.aspectRatio || 'Unknown'}
+                      {record.editorState.aspectRatio || t.settings.unknownAspect}
                     </td>
                     <td className="px-3 py-2.5 text-muted-foreground">
                       {formatTimestamp(record.timestamp)}

@@ -21,11 +21,17 @@ export class HttpRenderer implements VideoRenderer {
       body: JSON.stringify(params),
     });
 
-    if (!response.ok) {
-      throw new Error(`Render request failed: ${response.statusText}`);
-    }
+    const responseData = await response.json().catch(() => ({}));
 
-    const responseData = await response.json();
+    if (!response.ok) {
+      const detail =
+        (responseData as { error?: string; details?: string }).error ||
+        (responseData as { error?: string; details?: string }).details ||
+        JSON.stringify(responseData);
+      throw new Error(
+        `Render request failed (${response.status}): ${detail || response.statusText}`
+      );
+    }
     
     // Handle different response structures
     // Lambda renderer wraps response in { type: "success", data: ... }
@@ -35,7 +41,7 @@ export class HttpRenderer implements VideoRenderer {
     }
     
     // Direct response (SSR)
-    return responseData;
+    return responseData as RenderResponse;
   }
 
   async getProgress(params: ProgressParams): Promise<ProgressResponse> {
@@ -47,11 +53,17 @@ export class HttpRenderer implements VideoRenderer {
       body: JSON.stringify(params),
     });
 
-    if (!response.ok) {
-      throw new Error(`Progress request failed: ${response.statusText}`);
-    }
+    const responseData = await response.json().catch(() => ({}));
 
-    const responseData = await response.json();
+    if (!response.ok) {
+      const detail =
+        (responseData as { error?: string; details?: string }).error ||
+        (responseData as { error?: string; details?: string }).details ||
+        JSON.stringify(responseData);
+      throw new Error(
+        `Progress request failed (${response.status}): ${detail || response.statusText}`
+      );
+    }
     
     // Handle different response structures
     // Lambda renderer wraps response in { type: "success", data: ... }
@@ -61,7 +73,7 @@ export class HttpRenderer implements VideoRenderer {
     }
     
     // Direct response (SSR)
-    return responseData;
+    return responseData as ProgressResponse;
   }
 
   get renderType(): RenderTypeInfo {

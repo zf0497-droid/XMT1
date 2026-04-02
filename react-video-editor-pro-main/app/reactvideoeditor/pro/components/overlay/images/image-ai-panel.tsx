@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react";
 import { useEditorContext } from "../../../contexts/editor-context";
 import { Slider } from "../../ui/slider";
 import { Switch } from "../../ui/switch";
+import { t } from "../../../locales";
 
 /**
  * Props for the ImageAIPanel component
@@ -116,10 +117,10 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
               <div>
                 <h4 className="text-sm font-extralight text-foreground flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  Green Screen Removal
+                  {t.ai.greenScreenTitle}
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-extralight">
-                  Remove green screen background from your image
+                  {t.ai.greenScreenDescImage}
                 </p>
               </div>
               <Switch
@@ -134,7 +135,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-extralight">
-                      Sensitivity
+                      {t.ai.sensitivity}
                     </label>
                     <span className="text-xs min-w-[40px] text-right">
                       {greenscreenSensitivity}
@@ -149,14 +150,14 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                     className="w-full"
                   />
                   <p className="text-xs text-muted-foreground font-extralight">
-                    Higher values remove more green
+                    {t.ai.higherGreenRemoves}
                   </p>
                 </div>
 
                 {/* Advanced Controls Collapsible */}
                 <details className="space-y-2">
                   <summary className="text-xs font-extralight cursor-pointer hover:text-foreground">
-                    Advanced Settings
+                    {t.ai.advancedSettings}
                   </summary>
                   
                   <div className="space-y-3 pt-2">
@@ -164,7 +165,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Red Threshold
+                          {t.ai.redThreshold}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {redThreshold}
@@ -184,7 +185,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Green Minimum
+                          {t.ai.greenMinimum}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {greenMin}
@@ -204,7 +205,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Blue Threshold
+                          {t.ai.blueThreshold}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {blueThreshold}
@@ -224,7 +225,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Edge Smoothing
+                          {t.ai.edgeSmoothing}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {smoothing}
@@ -244,7 +245,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Spill Removal
+                          {t.ai.spillRemoval}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {spill.toFixed(2)}
@@ -259,7 +260,7 @@ export const ImageAIPanel: React.FC<ImageAIPanelProps> = ({
                         className="w-full"
                       />
                       <p className="text-xs text-muted-foreground font-extralight">
-                        Remove green tint from edges
+                        {t.ai.spillRemovalHint}
                       </p>
                     </div>
                   </div>

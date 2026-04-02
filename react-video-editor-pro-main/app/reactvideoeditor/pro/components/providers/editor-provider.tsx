@@ -7,6 +7,8 @@ import { useCompositionDuration } from "../../hooks/use-composition-duration";
 import { useAutosave } from "../../hooks/use-autosave";
 import { useAspectRatio } from "../../hooks/use-aspect-ratio";
 import { Overlay, CaptionStyles, AspectRatio } from "../../types";
+import { syncProjectToRemote } from "../../utils/project-remote-sync";
+import { COMP_NAME } from "../../../../constants";
 
 import { useRendering } from "../../hooks/use-rendering";
 import { useRenderer } from "../../contexts/renderer-context";
@@ -33,6 +35,11 @@ interface EditorProviderProps {
   
   // API Configuration
   baseUrl?: string;
+
+  /** 本地保存成功后，是否同步到你们自己的保存接口（/api/projects/save） */
+  enableRemoteSync?: boolean;
+  /** 远程同步防抖（毫秒），默认 8000 */
+  remoteSyncDebounceMs?: number;
   
   // Timeline Configuration
   initialRows?: number;
@@ -81,6 +88,8 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   
   // API Configuration
   baseUrl,
+  enableRemoteSync = false,
+  remoteSyncDebounceMs = 8000,
   
   // Configuration props
   initialRows = 5,
@@ -214,7 +223,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
   // Set up rendering functionality
   const { renderMedia: triggerRender, state: renderState } = useRendering(
-    projectId, // Use projectId as composition ID
+    COMP_NAME, // Remotion bundle 里的 Composition id，需与 root.tsx 一致
     {
       overlays,
       durationInFrames,
@@ -253,10 +262,25 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     });
   }, [overlays, selectedOverlayId, selectedOverlayIds, aspectRatio, playbackRate, durationInFrames, currentFrame, backgroundColor]);
 
+  const onRemoteSync = useCallback(
+    async (editorState: Record<string, unknown>) => {
+      await syncProjectToRemote({
+        id: projectId,
+        overlays: (editorState.overlays as []) ?? [],
+        aspect_ratio: editorState.aspectRatio as string | undefined,
+        background_color: editorState.backgroundColor as string | undefined,
+      });
+    },
+    [projectId]
+  );
+
   // Autosave functionality
   const { saveState, isInitialLoadComplete } = useAutosave(projectId, state, {
     interval: autoSaveInterval,
     isLoadingProject, // Pass project loading state to prevent overwriting project overlays
+    enableRemoteSync,
+    onRemoteSync,
+    remoteSyncDebounceMs,
     onLoad: (loadedState) => {
       // Apply loaded state to editor automatically
       if (loadedState.overlays) {

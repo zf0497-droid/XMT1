@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { ClipOverlay } from "../../../types";
 import { RefreshCw } from "lucide-react";
 import { Button } from "../../ui/button";
+import { t } from "../../../locales";
 
 interface VideoPreviewProps {
   /** The video overlay to preview */
@@ -43,7 +44,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
     >
       <img
         src={overlay.content}
-        alt="Video preview"
+        alt={t.video.previewAlt}
         className="absolute inset-0 w-full h-full object-contain"
         style={{
           filter: overlay.styles?.filter || 'none',
@@ -64,7 +65,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({
             size="sm"
           >
             <RefreshCw className="w-3 h-3" />
-            Change Video
+            {t.video.changeVideo}
           </Button>
         </div>
       )}

@@ -34,19 +34,18 @@ export const ApplyTemplateDialog: React.FC<ApplyTemplateDialogProps> = ({
       <AlertDialogContent className="w-[90%] max-w-md mx-auto rounded-lg p-6">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-lg font-extralight text-foreground">
-            Apply Template
+            应用模板
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-muted-foreground font-extralight">
-            Are you sure you want to add this template to your timeline? It
-            will replace all existing overlays.
+            确定要将此模板添加到时间轴吗？会替换当前所有叠加层。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-3">
           <AlertDialogCancel className="h-8 text-xs font-extralight text-muted-foreground">
-            Cancel
+            取消
           </AlertDialogCancel>
           <AlertDialogAction className="h-8 text-xs font-extralight" onClick={handleApply}>
-            Apply Template
+            应用模板
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

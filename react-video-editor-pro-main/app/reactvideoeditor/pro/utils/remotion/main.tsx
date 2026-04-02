@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { AbsoluteFill } from "remotion";
 import type { FontInfo } from "@remotion/google-fonts";
 
@@ -95,6 +95,11 @@ export const Main: React.FC<MainProps> = ({
     [setSelectedOverlayId]
   );
 
+  const visibleOverlays = useMemo(
+    () => overlays.filter((o) => !o.timelineTrackHidden),
+    [overlays]
+  );
+
   return (
     <AbsoluteFill
       style={{
@@ -104,7 +109,7 @@ export const Main: React.FC<MainProps> = ({
       onPointerDown={onPointerDown}
     >
       <AbsoluteFill style={layerContainer}>
-        {overlays.map((overlay) => {
+        {visibleOverlays.map((overlay) => {
           return (
             <Layer
               key={overlay.id}
@@ -117,7 +122,7 @@ export const Main: React.FC<MainProps> = ({
       </AbsoluteFill>
       <SortedOutlines
         selectedOverlayId={selectedOverlayId}
-        overlays={overlays}
+        overlays={visibleOverlays}
         changeOverlay={changeOverlay}
         alignmentGuides={alignmentGuides}
       />

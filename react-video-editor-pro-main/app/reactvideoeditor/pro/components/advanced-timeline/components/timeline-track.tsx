@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { cn } from '../../../utils/general/utils';
 import { TimelineTrack as TimelineTrackType, TimelineItem as TimelineItemType } from '../types';
 import { TimelineItem } from './timeline-item';
 import { TimelineGhostElement } from './timeline-ghost-element';
 import { TimelineGapIndicator } from './timeline-gap-indicator';
 import { findGapsInTrack } from '../utils/gap-utils';
+import { rowDragOverToInsertionGap } from '../utils/track-reorder-utils';
 import { TIMELINE_CONSTANTS } from '../constants';
 import useTimelineStore from '../stores/use-timeline-store';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TimelineTrackProps {
   track: TimelineTrackType;
@@ -68,6 +71,23 @@ export const TimelineTrack: React.FC<TimelineTrackProps> = ({
 }) => {
   const { magneticPreview } = useTimelineStore();
 
+  const reorderUi = useTimelineStore(
+    useShallow(
+      useCallback((s) => {
+        const src = s.trackReorderSourceIndex;
+        const hov = s.trackReorderHoverIndex;
+        const isSource = src === trackIndex;
+        const isHover = hov === trackIndex;
+        return {
+          showReorderChrome: src !== null && (isSource || isHover),
+          isReorderSource: isSource,
+          isReorderHover: isHover,
+        };
+      }, [trackIndex])
+    )
+  );
+  const { showReorderChrome, isReorderSource, isReorderHover } = reorderUi;
+
   // Find gaps in the track for gap indicators
   const gaps = findGapsInTrack(track.items);
 
@@ -99,12 +119,29 @@ export const TimelineTrack: React.FC<TimelineTrackProps> = ({
   // Determine which items to render and their positions
   const shouldShowPreview = magneticPreview && magneticPreview.trackId === track.id && isDragging;
 
+  const trackHidden = track.visible === false;
+
+  const handleTrackReorderDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (useTimelineStore.getState().trackReorderSourceIndex === null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const rect = e.currentTarget.getBoundingClientRect();
+    const gap = rowDragOverToInsertionGap(e.clientY, rect, trackIndex, trackCount);
+    useTimelineStore.getState().updateTrackReorderPreview(trackIndex, gap);
+  };
+
   return (
     <div 
-      className="track relative bg-(--timeline-row) border-b border-(--border) w-full transition-all duration-200 ease-in-out"
+      className={cn(
+        'track relative w-full border-b border-(--border)',
+        'bg-(--timeline-row) transition-all duration-200 ease-in-out',
+        trackHidden && 'opacity-40',
+        showReorderChrome && 'z-[90] isolate'
+      )}
       style={{ 
         height: `${TIMELINE_CONSTANTS.TRACK_HEIGHT}px`,
       }}
+      onDragOver={handleTrackReorderDragOver}
     >
       {shouldShowPreview ? (
         // Render preview items with shifted positions
@@ -198,6 +235,25 @@ export const TimelineTrack: React.FC<TimelineTrackProps> = ({
           isFloating={false}
         />
       ))}
+
+      {/* 盖在片段之上：ring/背景画在轨道层会被不透明 clip 挡住，必须用顶层 overlay */}
+      {showReorderChrome && (
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 z-[200]',
+            isReorderSource &&
+              isReorderHover &&
+              'bg-primary/35 shadow-[inset_0_0_0_4px_hsl(var(--primary)),0_12px_36px_-8px_rgba(0,0,0,0.55)]',
+            isReorderSource &&
+              !isReorderHover &&
+              'bg-primary/22 shadow-[inset_0_0_0_3px_hsl(var(--primary)/0.9),0_8px_24px_-6px_rgba(0,0,0,0.45)]',
+            !isReorderSource &&
+              isReorderHover &&
+              'bg-[hsl(var(--primary)/0.32)] shadow-[inset_0_0_0_4px_hsl(var(--primary)),0_0_28px_-2px_hsl(var(--primary)/0.55)]'
+          )}
+          aria-hidden
+        />
+      )}
     </div>
   );
 };

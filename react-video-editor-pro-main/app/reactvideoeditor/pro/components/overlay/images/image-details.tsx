@@ -6,6 +6,7 @@ import { ImagePreview } from "./image-preview";
 import { ImageAIPanel } from "./image-ai-panel";
 import { UnifiedTabs } from "../shared/unified-tabs";
 import { Settings, PaintBucket, Sparkles } from "lucide-react";
+import { t } from "../../../locales";
 
 /**
  * Props for the ImageDetails component
@@ -85,7 +86,7 @@ export const ImageDetails: React.FC<ImageDetailsProps> = ({
         tabs={[
           {
             value: "settings",
-            label: "Settings",
+            label: t.tabs.settings,
             icon: <Settings className="w-4 h-4" />,
             content: (
               <ImageSettingsPanel
@@ -97,7 +98,7 @@ export const ImageDetails: React.FC<ImageDetailsProps> = ({
           },
           {
             value: "style",
-            label: "Style",
+            label: t.tabs.style,
             icon: <PaintBucket className="w-4 h-4" />,
             content: (
               <ImageStylePanel
@@ -108,7 +109,7 @@ export const ImageDetails: React.FC<ImageDetailsProps> = ({
           },
           {
             value: "ai",
-            label: "AI",
+            label: t.tabs.ai,
             icon: <Sparkles className="w-4 h-4" />,
             content: (
               <ImageAIPanel

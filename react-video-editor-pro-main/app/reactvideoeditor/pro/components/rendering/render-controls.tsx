@@ -1,11 +1,21 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { Bell, Download, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN as locale } from "date-fns/locale";
 import { useEditorContext } from "../../contexts/editor-context";
 import { t } from "../../locales";
+import type { RenderQualityPreset } from "../../types/renderer";
+import { cn } from "../../utils/general/utils";
 
 /**
  * Interface representing a single video render attempt
@@ -30,7 +40,7 @@ interface RenderItem {
  */
 interface RenderControlsProps {
   state: any;
-  handleRender: () => void;
+  handleRender: (qualityPreset?: RenderQualityPreset) => void | Promise<void>;
 }
 
 /**
@@ -52,13 +62,58 @@ const RenderControls: React.FC<RenderControlsProps> = ({
   // Get render type from editor context
   const { renderType } = useEditorContext();
   
-  // Check if rendering is enabled via environment variable
-  const isRenderingEnabled = process.env.NEXT_PUBLIC_RENDERING_ENABLED === "true";
+  /**
+   * 默认允许渲染（与 README 的 NEXT_PUBLIC_DISABLE_RENDER 一致）。
+   * 仅当 NEXT_PUBLIC_DISABLE_RENDER=true 时禁用。
+   * 兼容旧配置：NEXT_PUBLIC_RENDERING_ENABLED=false 时也会关闭。
+   */
+  const isRenderingEnabled =
+    process.env.NEXT_PUBLIC_DISABLE_RENDER !== "true" &&
+    process.env.NEXT_PUBLIC_RENDERING_ENABLED !== "false";
   
   // Store multiple renders
   const [renders, setRenders] = React.useState<RenderItem[]>([]);
   // Track if there are new renders
   const [hasNewRender, setHasNewRender] = React.useState(false);
+
+  const [qualityDialogOpen, setQualityDialogOpen] = React.useState(false);
+  const [selectedQuality, setSelectedQuality] =
+    React.useState<RenderQualityPreset>("balanced");
+
+  const qualityOptions: {
+    id: RenderQualityPreset;
+    title: string;
+    desc: string;
+    badge?: string;
+  }[] = [
+    {
+      id: "fast",
+      title: t.render.qualityFast,
+      desc: t.render.qualityFastDesc,
+    },
+    {
+      id: "balanced",
+      title: t.render.qualityBalanced,
+      desc: t.render.qualityBalancedDesc,
+      badge: t.render.qualityRecommended,
+    },
+    {
+      id: "high",
+      title: t.render.qualityHigh,
+      desc: t.render.qualityHighDesc,
+    },
+  ];
+
+  const openQualityDialog = () => {
+    if (!isRenderingEnabled) return;
+    if (state.status === "rendering" || state.status === "invoking") return;
+    setQualityDialogOpen(true);
+  };
+
+  const confirmRender = () => {
+    setQualityDialogOpen(false);
+    void handleRender(selectedQuality);
+  };
 
   // Add new render to the list when completed
   React.useEffect(() => {
@@ -191,8 +246,63 @@ const RenderControls: React.FC<RenderControlsProps> = ({
         </PopoverContent>
       </Popover>
 
+      <Dialog open={qualityDialogOpen} onOpenChange={setQualityDialogOpen}>
+        <DialogContent className="sm:max-w-md" aria-describedby="render-quality-desc">
+          <DialogHeader>
+            <DialogTitle className="font-light text-lg">
+              {t.render.qualityTitle}
+            </DialogTitle>
+            <DialogDescription id="render-quality-desc" className="text-sm font-extralight">
+              {t.render.qualityHint}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2 py-2">
+            {qualityOptions.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setSelectedQuality(opt.id)}
+                className={cn(
+                  "rounded-lg border p-3 text-left transition-colors",
+                  "hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring",
+                  selectedQuality === opt.id
+                    ? "border-primary bg-primary/10 ring-1 ring-primary/30"
+                    : "border-border bg-background"
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium text-foreground">
+                    {opt.title}
+                  </span>
+                  {opt.badge && (
+                    <span className="text-[10px] rounded-full bg-primary/20 px-2 py-0.5 text-primary">
+                      {opt.badge}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground font-extralight leading-relaxed">
+                  {opt.desc}
+                </p>
+              </button>
+            ))}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setQualityDialogOpen(false)}
+            >
+              {t.common.cancel}
+            </Button>
+            <Button type="button" onClick={confirmRender}>
+              {t.render.startRender}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Button
-        onClick={handleRender}
+        onClick={openQualityDialog}
         size="sm"
         variant="outline"
         disabled={state.status === "rendering" || state.status === "invoking" || !isRenderingEnabled}

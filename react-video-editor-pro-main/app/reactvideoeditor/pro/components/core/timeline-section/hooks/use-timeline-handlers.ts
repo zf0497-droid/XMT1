@@ -47,15 +47,18 @@ export const useTimelineHandlers = ({
   const handleTracksChange = React.useCallback((newTracks: TimelineTrack[]) => {
     // Set flag to prevent circular updates
     isUpdatingFromTimelineRef.current = true;
-    
+
     const newOverlays = transformTracksToOverlays(newTracks);
-    
-    setOverlays(newOverlays);
-    
+
+    // Defer state update to avoid updating during render
+    setTimeout(() => {
+      setOverlays(newOverlays);
+    }, 0);
+
     // Reset flag after a longer delay to prevent race conditions with debounced text panel updates
     setTimeout(() => {
       isUpdatingFromTimelineRef.current = false;
-    }, 500); // Increased from 0 to 500ms to account for debounced updates
+    }, 500);
   }, [setOverlays, transformTracksToOverlays]);
 
   // Handler for frame changes from timeline

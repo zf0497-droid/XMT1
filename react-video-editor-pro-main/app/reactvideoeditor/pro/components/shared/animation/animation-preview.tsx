@@ -1,12 +1,23 @@
 import React, { useState } from "react";
 import { cn } from "../../../utils/general/utils";
-import type { AnimationTemplate } from "../../../templates/animation-templates";
+import type { AnimationTemplate } from "../../../adaptors/default-animation-adaptors";
+import { t } from "../../../locales";
 
 interface AnimationPreviewProps {
   animation: AnimationTemplate;
   isSelected: boolean;
   onClick: () => void;
   animationType?: "enter" | "exit";
+}
+
+function animationDisplayName(animation: AnimationTemplate): string {
+  const key = animation.key ?? "none";
+  const names = t.animation.presetNames as Record<string, string>;
+  return names[key] ?? animation.name;
+}
+
+function isNoneAnimation(animation: AnimationTemplate): boolean {
+  return (animation.key ?? "none") === "none";
 }
 
 export const AnimationPreview: React.FC<AnimationPreviewProps> = ({
@@ -17,8 +28,8 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({
   const [isHovering, setIsHovering] = useState(false);
 
   const getAnimationStyle = () => {
-    if (!animation.enter || animation.name === "None") return {};
-    
+    if (!animation.enter || isNoneAnimation(animation)) return {};
+
     const styles = animation.enter(isHovering ? 40 : 0, 40) || {};
     return {
       ...styles,
@@ -48,8 +59,8 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({
           )}
           style={{ opacity: isHovering ? 0.3 : 0.8 }}
         />
-        
-        {animation.name !== "None" && (
+
+        {!isNoneAnimation(animation) && (
           <div
             className="absolute inset-0 h-6 w-6 rounded-full border-2 border-dashed border-primary"
             style={{
@@ -67,7 +78,7 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({
           isSelected ? "text-primary" : "text-muted-foreground"
         )}
       >
-        {animation.name}
+        {animationDisplayName(animation)}
       </p>
     </button>
   );

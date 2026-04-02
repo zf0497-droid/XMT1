@@ -31,6 +31,13 @@ export const useTimelineTransforms = () => {
     for (let i = 0; i <= maxRow; i++) {
       const overlaysInRow = rowMap.get(i) || [];
       
+      const first = overlaysInRow[0] as Overlay & {
+        timelineTrackHidden?: boolean;
+        timelineTrackMuted?: boolean;
+      };
+      const rowHidden = first?.timelineTrackHidden === true;
+      const rowMuted = first?.timelineTrackMuted === true;
+
       const items: TimelineItem[] = overlaysInRow.map(overlay => {
         const baseItem = {
           id: overlay.id.toString(),
@@ -81,8 +88,8 @@ export const useTimelineTransforms = () => {
         name: `Track ${i + 1}`,
         items,
         magnetic: false,
-        visible: true,
-        muted: false,
+        visible: !rowHidden,
+        muted: rowMuted,
       });
     }
 
@@ -112,12 +119,16 @@ export const useTimelineTransforms = () => {
         if (item.data && typeof item.data === 'object') {
           // Use the original overlay data if available
           const originalOverlay = item.data as Overlay;
-          
+          const hidden = track.visible === false;
+          const muted = track.muted === true;
+
           const updatedOverlay: Overlay = {
             ...originalOverlay,
             from: Math.round(item.start * FPS), // Convert seconds to frames
             durationInFrames: Math.round((item.end - item.start) * FPS),
             row: trackIndex,
+            timelineTrackHidden: hidden,
+            timelineTrackMuted: muted,
           };
         
 

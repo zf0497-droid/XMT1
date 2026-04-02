@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { t } from '../locales';
 
 export type BuiltInTheme = 'light' | 'dark';
 export type ExtendedThemeMode = BuiltInTheme | string; // Allow custom theme IDs
@@ -39,15 +40,15 @@ export interface UseExtendedThemeSwitcherReturn {
 const defaultThemes: CustomTheme[] = [
   {
     id: 'light',
-    name: 'Light',
+    name: t.theme.light,
     color: '#ffffff',
   },
   {
     id: 'dark',
-    name: 'Dark',
+    name: t.theme.dark,
     className: 'dark',
     color: '#1f2937',
-  }
+  },
 ];
 
 export const useExtendedThemeSwitcher = ({

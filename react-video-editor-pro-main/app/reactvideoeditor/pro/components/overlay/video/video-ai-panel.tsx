@@ -7,6 +7,7 @@ import { useEditorContext } from "../../../contexts/editor-context";
 import { useTimelinePositioning } from "../../../hooks/use-timeline-positioning";
 import { Slider } from "../../ui/slider";
 import { Switch } from "../../ui/switch";
+import { t } from "../../../locales";
 
 /**
  * Props for the VideoAIPanel component
@@ -188,7 +189,8 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
       return (
         <>
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          Generating... {progress !== undefined && `${Math.round(progress)}%`}
+          {t.ai.generating}
+          {progress !== undefined ? ` ${Math.round(progress)}%` : ""}
         </>
       );
     }
@@ -197,7 +199,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
       return (
         <>
           <CheckCircle className="w-4 h-4 mr-2" />
-          Captions Generated!
+          {t.ai.captionsGenerated}
         </>
       );
     }
@@ -206,7 +208,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
       return (
         <>
           <AlertCircle className="w-4 h-4 mr-2" />
-          Try Again
+          {t.ai.tryAgain}
         </>
       );
     }
@@ -214,7 +216,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
     return (
       <>
         <Wand2 className="w-4 h-4 mr-2" />
-        Generate Captions
+        {t.ai.generateCaptions}
       </>
     );
   };
@@ -235,10 +237,10 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
               <div>
                 <h4 className="text-sm font-extralight text-foreground flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  Green Screen Removal
+                  {t.ai.greenScreenTitle}
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-extralight">
-                  Remove green screen background from your video
+                  {t.ai.greenScreenDescVideo}
                 </p>
               </div>
               <Switch
@@ -253,7 +255,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-extralight">
-                      Sensitivity
+                      {t.ai.sensitivity}
                     </label>
                     <span className="text-xs min-w-[40px] text-right">
                       {greenscreenSensitivity}
@@ -268,14 +270,14 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     className="w-full"
                   />
                   <p className="text-xs text-muted-foreground font-extralight">
-                    Higher values remove more green
+                    {t.ai.higherGreenRemoves}
                   </p>
                 </div>
 
                 {/* Advanced Controls Collapsible */}
                 <details className="space-y-2">
                   <summary className="text-xs font-extralight cursor-pointer hover:text-foreground">
-                    Advanced Settings
+                    {t.ai.advancedSettings}
                   </summary>
                   
                   <div className="space-y-3 pt-2">
@@ -283,7 +285,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Red Threshold
+                          {t.ai.redThreshold}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {redThreshold}
@@ -303,7 +305,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Green Minimum
+                          {t.ai.greenMinimum}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {greenMin}
@@ -323,7 +325,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Blue Threshold
+                          {t.ai.blueThreshold}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {blueThreshold}
@@ -343,7 +345,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Edge Smoothing
+                          {t.ai.edgeSmoothing}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {smoothing}
@@ -363,7 +365,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-extralight">
-                          Spill Removal
+                          {t.ai.spillRemoval}
                         </label>
                         <span className="text-xs min-w-[40px] text-right">
                           {spill.toFixed(2)}
@@ -378,7 +380,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                         className="w-full"
                       />
                       <p className="text-xs text-muted-foreground font-extralight">
-                        Remove green tint from edges
+                        {t.ai.spillRemovalHint}
                       </p>
                     </div>
                   </div>
@@ -396,14 +398,14 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
             <div className="space-y-3">
               <div>
                 <h4 className="text-sm font-extralight text-foreground mb-1">
-                  Auto Captions
+                  {t.ai.autoCaptions}
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-extralight">
-                  Generate captions from the video&apos;s audio track using AI
+                  {t.ai.autoCaptionsDesc}
                 </p>
                 {!isServiceReady && (
                   <p className="text-xs text-amber-600 mt-1 font-extralight">
-                    AI service not configured. Using demo mode.
+                    {t.ai.demoModeWarning}
                   </p>
                 )}
               </div>
@@ -422,7 +424,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground font-extralight">Processing audio...</p>
+                  <p className="text-xs text-muted-foreground font-extralight">{t.ai.processingAudio}</p>
                 </div>
               )}
               
@@ -444,7 +446,7 @@ export const VideoAIPanel: React.FC<VideoAIPanelProps> = ({
                     size="sm"
                     className="px-3"
                   >
-                    Reset
+                    {t.common.reset}
                   </Button>
                 )}
               </div>

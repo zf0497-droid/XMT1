@@ -54,7 +54,7 @@ export const TemplateGrid: React.FC<TemplateGridProps> = ({
     return (
       <div className="bg-destructive border border-destructive rounded-lg p-3">
         <div className="text-destructive text-sm font-extralight">
-          Error loading templates: {error}
+          加载模板失败：{error}
         </div>
       </div>
     );

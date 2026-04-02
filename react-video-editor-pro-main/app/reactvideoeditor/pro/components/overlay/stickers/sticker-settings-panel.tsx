@@ -1,6 +1,7 @@
 import React from "react";
 import { StickerOverlay } from "../../../types";
-  import { Alert, AlertDescription, AlertTitle } from "../../ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "../../ui/alert";
+import { t } from "../../../locales";
 
 /**
  * Props for the StickerSettingsPanel component
@@ -25,9 +26,9 @@ export const StickerSettingsPanel: React.FC<StickerSettingsPanelProps> = ({
     <div className="space-y-2">
   
   <Alert variant="default">
-  <AlertTitle>Sticker Settings</AlertTitle>
+  <AlertTitle>{t.sticker.settingsComingTitle}</AlertTitle>
   <AlertDescription>
-    Soon you will be able to customize your sticker settings here.
+    {t.sticker.settingsComingDesc}
   </AlertDescription>
 </Alert>
 

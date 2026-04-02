@@ -1,23 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import type { Overlay } from '../../../../reactvideoeditor/pro/types';
+
+export const runtime = 'nodejs';
 import { startRendering } from '../lib/remotion-renderer';
 import { collectFontInfoFromOverlays } from '../../../../reactvideoeditor/pro/utils/text/collect-font-info-from-items';
 
 // Define the request schema based on the VideoRenderer interface
 const RenderRequest = z.object({
   id: z.string(),
-  inputProps: z.object({
-    overlays: z.array(z.any()),
-    durationInFrames: z.number(),
-    fps: z.number(),
-    width: z.number(),
-    height: z.number(),
-    src: z.string().optional(),
-    selectedOverlayId: z.number().nullable().optional(),
-    setSelectedOverlayId: z.any().optional(),
-    changeOverlay: z.any().optional(),
-    baseUrl: z.string().optional(),
-  }),
+  /** passthrough 保留客户端可能多传的字段，避免误删 */
+  inputProps: z
+    .object({
+      overlays: z.array(z.any()),
+      durationInFrames: z.number(),
+      fps: z.number(),
+      width: z.number(),
+      height: z.number(),
+      src: z.string().optional(),
+      selectedOverlayId: z.number().nullable().optional(),
+      setSelectedOverlayId: z.any().optional(),
+      changeOverlay: z.any().optional(),
+      baseUrl: z.string().optional(),
+    })
+    .passthrough(),
+  /** 用户在前端选择的画质档位 */
+  qualityPreset: z.enum(["fast", "balanced", "high"]).optional(),
 });
 
 /**
@@ -33,8 +41,10 @@ export async function POST(request: NextRequest) {
     // Validate the request
     const validatedData = RenderRequest.parse(body);
     
-    // Collect font infos before rendering
-    const fontInfos = collectFontInfoFromOverlays(validatedData.inputProps.overlays || []);
+    // Collect font infos before rendering（内部已跳过 null 元素）
+    const fontInfos = collectFontInfoFromOverlays(
+      (validatedData.inputProps.overlays || []) as Overlay[]
+    );
     
     // Add fontInfos to inputProps
     const inputPropsWithFonts = {
@@ -45,7 +55,8 @@ export async function POST(request: NextRequest) {
     // Start the rendering process
     const renderId = await startRendering(
       validatedData.id,
-      inputPropsWithFonts
+      inputPropsWithFonts,
+      validatedData.qualityPreset
     );
     
     const endTime = performance.now();

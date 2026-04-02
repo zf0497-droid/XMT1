@@ -4,6 +4,7 @@ import { Slider } from "../../ui/slider";
 import { Button } from "../../ui/button";
 import ColorPicker from "react-best-gradient-color-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { t } from "../../../locales";
 
 /**
  * Props for the MediaPaddingControls component
@@ -47,7 +48,7 @@ export const MediaPaddingControls: React.FC<MediaPaddingControlsProps> = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-xs text-foreground font-extralight">
-            Padding
+            {t.common.padding}
           </label>
           <span className="text-xs min-w-[40px] text-right">
             {paddingValue}
@@ -68,7 +69,7 @@ export const MediaPaddingControls: React.FC<MediaPaddingControlsProps> = ({
       {/* Padding Background Color */}
       <div className="space-y-2">
         <label className="text-xs text-foreground font-extralight">
-          Padding Background
+          {t.common.paddingBackground}
         </label>
         <div className="flex items-center gap-2">
           <div className="space-y-2">
@@ -105,7 +106,7 @@ export const MediaPaddingControls: React.FC<MediaPaddingControlsProps> = ({
             onChange={(e) =>
               handleStyleChange({ paddingBackgroundColor: e.target.value })
             }
-            placeholder="white"
+            placeholder={t.settings.colorPlaceholder}
             className="flex-1 bg-background border rounded-md text-xs p-2 hover:border transition-colors text-primary"
           />
           {paddingBackgroundColor !== "white" && (
@@ -116,7 +117,7 @@ export const MediaPaddingControls: React.FC<MediaPaddingControlsProps> = ({
               variant="ghost"
               size="sm"
             >
-              Clear
+              {t.common.clear}
             </Button>
           )}
         </div>

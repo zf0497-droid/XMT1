@@ -26,6 +26,17 @@ interface AutosaveOptions {
    * If true, autosave will wait before loading from IndexedDB
    */
   isLoadingProject?: boolean;
+
+  /**
+   * 本地保存成功后，防抖同步到你们自己的接口（经 /api/projects/save）
+   */
+  onRemoteSync?: (state: any) => Promise<void>;
+
+  /** 防抖毫秒数，默认 8000 */
+  remoteSyncDebounceMs?: number;
+
+  /** 是否启用远程同步（默认 false） */
+  enableRemoteSync?: boolean;
 }
 
 /**
@@ -41,9 +52,18 @@ export const useAutosave = (
   state: any,
   options: AutosaveOptions = {}
 ) => {
-  const { interval = 5000, onLoad, onSave, isLoadingProject = false } = options;
+  const {
+    interval = 5000,
+    onLoad,
+    onSave,
+    isLoadingProject = false,
+    onRemoteSync,
+    remoteSyncDebounceMs = 8000,
+    enableRemoteSync = false,
+  } = options;
 
   const timerRef = useRef<any | null>(null);
+  const remoteSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedStateRef = useRef<string>("");
   const [hasCheckedForAutosave, setHasCheckedForAutosave] = useState(false);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
@@ -88,6 +108,19 @@ export const useAutosave = (
     // Don't start autosave if projectId is not valid
     if (!projectId) return;
 
+    const scheduleRemoteSync = (snapshot: any) => {
+      if (!enableRemoteSync || !onRemoteSync) return;
+      if (remoteSyncTimerRef.current) {
+        clearTimeout(remoteSyncTimerRef.current);
+      }
+      remoteSyncTimerRef.current = setTimeout(() => {
+        remoteSyncTimerRef.current = null;
+        onRemoteSync(snapshot).catch((err) => {
+          console.error("[Autosave] Remote sync failed:", err);
+        });
+      }, remoteSyncDebounceMs);
+    };
+
     const saveIfChanged = async () => {
       const currentStateString = JSON.stringify(state);
 
@@ -97,6 +130,7 @@ export const useAutosave = (
           await saveEditorState(projectId, state);
           lastSavedStateRef.current = currentStateString;
           if (onSave) onSave();
+          scheduleRemoteSync(state);
         } catch (error) {
           console.error('[Autosave] Save failed:', error);
         }
@@ -112,8 +146,20 @@ export const useAutosave = (
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+      if (remoteSyncTimerRef.current) {
+        clearTimeout(remoteSyncTimerRef.current);
+        remoteSyncTimerRef.current = null;
+      }
     };
-  }, [projectId, state, interval, onSave]);
+  }, [
+    projectId,
+    state,
+    interval,
+    onSave,
+    enableRemoteSync,
+    onRemoteSync,
+    remoteSyncDebounceMs,
+  ]);
 
   // Function to manually save state
   const saveState = async () => {
@@ -121,6 +167,11 @@ export const useAutosave = (
       await saveEditorState(projectId, state);
       lastSavedStateRef.current = JSON.stringify(state);
       if (onSave) onSave();
+      if (enableRemoteSync && onRemoteSync) {
+        onRemoteSync(state).catch((err) => {
+          console.error("[Autosave] Remote sync failed:", err);
+        });
+      }
       return true;
     } catch (error) {
       console.error('[Autosave] Manual save failed:', error);

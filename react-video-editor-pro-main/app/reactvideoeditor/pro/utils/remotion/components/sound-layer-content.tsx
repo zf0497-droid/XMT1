@@ -87,7 +87,8 @@ export const SoundLayerContent: React.FC<SoundLayerContentProps> = ({
     fadeMultiplier *= fadeOutMultiplier;
   }
   
-  const finalVolume = baseVolume * fadeMultiplier;
+  const trackMuteFactor = overlay.timelineTrackMuted ? 0 : 1;
+  const finalVolume = baseVolume * fadeMultiplier * trackMuteFactor;
 
   return (
     <Html5Audio

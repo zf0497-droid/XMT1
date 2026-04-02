@@ -10,6 +10,17 @@ import { useTimelinePositioning } from "../../../hooks/use-timeline-positioning"
 import { UnifiedTabs } from "../shared/unified-tabs";
 import { StickerPreview } from "./sticker-preview";
 import { StickerDetails } from "./sticker-details";
+import { t } from "../../../locales";
+
+const STICKER_CATEGORY_LABEL: Record<string, string> = {
+  Default: t.sticker.categoryDefault,
+  Emojis: t.sticker.categoryEmojis,
+  Shapes: t.sticker.categoryShapes,
+};
+
+function stickerTabLabel(category: string): string {
+  return STICKER_CATEGORY_LABEL[category] ?? category;
+}
 
 export function StickersPanel() {
   const { 
@@ -131,7 +142,7 @@ export function StickersPanel() {
         defaultValue={stickerCategories[0]}
         tabs={stickerCategories.map((category) => ({
           value: category,
-          label: category,
+          label: stickerTabLabel(category),
           content: (
             <div className="overflow-y-auto scrollbar-hide h-[calc(100vh-100px)]">
               {renderStickerContent(category)}

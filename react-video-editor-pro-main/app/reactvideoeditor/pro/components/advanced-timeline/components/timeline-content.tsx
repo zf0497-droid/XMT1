@@ -9,8 +9,13 @@ import { useTimelineDragAndDrop } from '../hooks/use-timeline-drag-and-drop';
 import { useNewItemDrag } from '../hooks/use-new-item-drag';
 import { useMarqueeSelection } from '../hooks/use-marquee-selection';
 import useTimelineStore from '../stores/use-timeline-store';
+import { useShallow } from 'zustand/react/shallow';
 import { createPortal } from 'react-dom';
 import { TIMELINE_CONSTANTS } from '../constants';
+import {
+  contentYToInsertionGap,
+  insertionGapToSpliceIndex,
+} from '../utils/track-reorder-utils';
 
 /**
  * Timeline content area component that contains all the zoomable timeline elements
@@ -44,6 +49,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
   onContextMenuOpenChange,
   splittingEnabled = false,
   hideItemsOnDrag = false,
+  onTrackReorder,
 }) => {
   const currentTime = currentFrame / fps;
 
@@ -61,6 +67,13 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
     setInsertionIndex,
     currentDragPosition,
   } = useTimelineStore();
+
+  const { trackReorderSourceIndex, trackReorderGapIndex } = useTimelineStore(
+    useShallow((s) => ({
+      trackReorderSourceIndex: s.trackReorderSourceIndex,
+      trackReorderGapIndex: s.trackReorderGapIndex,
+    }))
+  );
 
   // Use store's isDragging state instead of prop
   const isDragging = isDraggingStore || !!draggedItem;
@@ -360,10 +373,35 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
     };
   }, []);
 
-  // Timeline-level drop handler for new items
+  /** 轨道重排在右侧时间轴区域松手：与左侧手柄 drop 一致（此前仅手柄能 drop，导致参考线对但顺序不变） */
   const handleTimelineDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
+
+      if (trackReorderSourceIndex !== null && onTrackReorder) {
+        const rect = timelineRef.current?.getBoundingClientRect();
+        const scrollParent = timelineRef.current?.closest(
+          '.timeline-tracks-scroll-container'
+        ) as HTMLElement | null | undefined;
+        const scrollTop = scrollParent?.scrollTop ?? 0;
+
+        // 松手瞬间以指针为准，避免 React 状态滞后导致「线已在底部但 gap 仍是 n-1」从而 from===to 不重排
+        let gap: number;
+        if (rect) {
+          const yInContent = e.clientY - rect.top + scrollTop;
+          gap = contentYToInsertionGap(yInContent, tracks.length);
+        } else {
+          gap = trackReorderGapIndex ?? trackReorderSourceIndex ?? 0;
+        }
+
+        const from = trackReorderSourceIndex;
+        const to = insertionGapToSpliceIndex(from, gap, tracks.length);
+        if (from !== to) {
+          onTrackReorder(from, to);
+        }
+        useTimelineStore.getState().endTrackReorder();
+        return;
+      }
 
       // Check if this is a new item drag
       try {
@@ -425,8 +463,40 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
       clearNewItemDragState();
       setInsertionIndex(null);
     },
-    [clearNewItemDragState, tracks.length, viewportDuration, handleNewItemDrop, timelineRef, insertionIndex, onInsertTrackAt, setInsertionIndex]
+    [
+      clearNewItemDragState,
+      tracks.length,
+      viewportDuration,
+      handleNewItemDrop,
+      timelineRef,
+      insertionIndex,
+      onInsertTrackAt,
+      setInsertionIndex,
+      trackReorderSourceIndex,
+      trackReorderGapIndex,
+      onTrackReorder,
+    ]
   );
+
+  const handleZoomableDragOver = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      if (useTimelineStore.getState().trackReorderSourceIndex !== null) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return;
+      }
+      handleNewItemDragOver(e);
+    },
+    [handleNewItemDragOver]
+  );
+
+  /** 捕获阶段允许整段区域（含片段层叠处）作为 drop 目标，避免仅冒泡不到 track 时无法松手落轨 */
+  const handleZoomableDragOverCapture = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    if (useTimelineStore.getState().trackReorderSourceIndex !== null) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+  }, []);
 
   return (
     <div 
@@ -479,7 +549,8 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
           onMouseMove={enhancedMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={onMouseLeave}
-          onDragOver={handleNewItemDragOver}
+          onDragOver={handleZoomableDragOver}
+          onDragOverCapture={handleZoomableDragOverCapture}
           onDragEnd={handleNewItemDragEnd}
           onDragLeave={handleNewItemDragLeave}
           onDrop={handleTimelineDrop}
@@ -544,6 +615,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
           <TimelineInsertionLine
             insertionIndex={insertionIndex}
             trackCount={tracks.length}
+            trackReorderGapIndex={trackReorderGapIndex}
           />
           
           {/* Marquee Selection */}

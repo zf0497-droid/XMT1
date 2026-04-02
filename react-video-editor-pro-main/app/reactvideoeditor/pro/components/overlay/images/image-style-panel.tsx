@@ -3,6 +3,14 @@ import { ImageOverlay } from "../../../types";
 import { MediaFilterPresetSelector } from "../common/media-filter-preset-selector";
 import { MediaPaddingControls } from "../common/media-padding-controls";
 import { Slider } from "../../ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../ui/select";
+import { t } from "../../../locales";
 
 /**
  * Props for the ImageStylePanel component
@@ -41,22 +49,26 @@ export const ImageStylePanel: React.FC<ImageStylePanelProps> = ({
     <div className="space-y-6">
       {/* Appearance Settings */}
       <div className="space-y-4 rounded-md bg-card p-4 border">
-        <h3 className="text-sm font-extralight text-foreground">Appearance</h3>
+        <h3 className="text-sm font-extralight text-foreground">{t.common.appearance}</h3>
 
         {/* Object Fit Setting */}
         <div className="space-y-2">
-          <label className="text-xs text-muted-foreground">Fit</label>
-          <select
+          <label className="text-xs text-muted-foreground">{t.layout.objectFit}</label>
+          <Select
             value={localOverlay?.styles?.objectFit ?? "cover"}
-            onChange={(e) =>
-              handleStyleChange({ objectFit: e.target.value as any })
+            onValueChange={(value) =>
+              handleStyleChange({ objectFit: value as any })
             }
-            className="w-full text-foreground bg-background border border-input rounded-md text-xs p-2 hover:border-accent-foreground transition-colors"
           >
-            <option value="cover">Cover</option>
-            <option value="contain">Contain</option>
-            <option value="fill">Fill</option>
-          </select>
+            <SelectTrigger className="w-full font-extralight shadow-none">
+              <SelectValue placeholder={t.layout.selectFit} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="cover">{t.layout.cover}</SelectItem>
+              <SelectItem value="contain">{t.layout.contain}</SelectItem>
+              <SelectItem value="fill">{t.layout.fill}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Filter Preset Selector */}
@@ -69,7 +81,7 @@ export const ImageStylePanel: React.FC<ImageStylePanelProps> = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-xs text-muted-foreground">
-              Border Radius
+              {t.common.borderRadius}
             </label>
             <span className="text-xs text-muted-foreground min-w-[40px] text-right">
               {localOverlay?.styles?.borderRadius ?? "0px"}
@@ -89,7 +101,7 @@ export const ImageStylePanel: React.FC<ImageStylePanelProps> = ({
         {/* Brightness Control */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-xs text-muted-foreground">Brightness</label>
+            <label className="text-xs text-muted-foreground">{t.filter.brightness}</label>
             <span className="text-xs text-muted-foreground min-w-[40px] text-right">
               {parseInt(
                 localOverlay?.styles?.filter?.match(

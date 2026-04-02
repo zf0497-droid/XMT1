@@ -5,8 +5,8 @@ import { Toaster } from "./reactvideoeditor/pro/components/ui/toaster";
 import { PostHogProvider } from "./reactvideoeditor/pro/components/providers/posthog-provider";
 
 export const metadata: Metadata = {
-  title: "React Video Editor | Pro",
-  description: "Purchased version of the React Video Editor.",
+  title: "智剪PRO",
+  description: "智剪PRO 视频编辑",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="zh-CN" suppressHydrationWarning>
       <head />
       <body suppressHydrationWarning>
         <PostHogProvider>

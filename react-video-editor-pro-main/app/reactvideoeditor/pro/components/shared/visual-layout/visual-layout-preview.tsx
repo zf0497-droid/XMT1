@@ -1,5 +1,12 @@
 import React from "react";
 import { Layout3DTemplate } from "../../../adaptors/default-3d-layout-adaptors";
+import { t } from "../../../locales";
+
+function layoutDisplayName(layout: Layout3DTemplate): string {
+  const key = layout.key ?? "none";
+  const names = t.layout.layout3DPresetNames as Record<string, string>;
+  return names[key] ?? layout.name;
+}
 
 interface VisualLayoutPreviewProps {
   layout: Layout3DTemplate;
@@ -90,7 +97,7 @@ export const VisualLayoutPreview: React.FC<VisualLayoutPreviewProps> = ({
         {/* Layout Name - Added top border for visual separation */}
         <div className="text-center w-full pt-1 border-t border-border/30">
           <div className="text-[9px] text-muted-foreground font-extralight leading-tight px-1">
-            {layout.name}
+            {layoutDisplayName(layout)}
           </div>
         </div>
       </div>

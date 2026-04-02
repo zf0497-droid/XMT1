@@ -72,7 +72,7 @@ export const SettingsPanel: React.FC = () => {
               type="text"
               value={backgroundColor}
               onChange={(e) => setBackgroundColor?.(e.target.value)}
-              placeholder="white"
+              placeholder={t.settings.colorPlaceholder}
               className="flex-1 bg-background border rounded-md text-xs p-2 hover:border transition-colors text-primary"
             />
             {backgroundColor !== "white" && (

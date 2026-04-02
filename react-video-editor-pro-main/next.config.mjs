@@ -1,6 +1,13 @@
-import {withSentryConfig} from "@sentry/nextjs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { withSentryConfig } from "@sentry/nextjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 避免上层目录另有 package-lock 时，Next 误判 monorepo 根目录导致追踪/构建异常
+  outputFileTracingRoot: path.join(__dirname),
   images: {
     remotePatterns: [
       {

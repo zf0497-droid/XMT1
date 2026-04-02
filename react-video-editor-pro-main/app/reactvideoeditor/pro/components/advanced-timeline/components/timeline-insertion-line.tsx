@@ -2,8 +2,13 @@ import React from 'react';
 import { TIMELINE_CONSTANTS } from '../constants';
 
 interface TimelineInsertionLineProps {
+  /** 素材拖移等产生的插入位置（与 store 一致） */
   insertionIndex: number | null;
   trackCount: number;
+  /**
+   * 轨道重排时的插入间隙 0…trackCount（优先于 insertionIndex，避免与素材拖移指示冲突）
+   */
+  trackReorderGapIndex?: number | null;
 }
 
 /**
@@ -12,7 +17,13 @@ interface TimelineInsertionLineProps {
 export const TimelineInsertionLine: React.FC<TimelineInsertionLineProps> = ({
   insertionIndex,
   trackCount,
+  trackReorderGapIndex,
 }) => {
+  // 轨道重排：全宽参考线在 timeline-tracks-wrapper 上绘制，此处不再重复
+  if (trackReorderGapIndex != null) {
+    return null;
+  }
+
   if (insertionIndex === null) {
     return null;
   }

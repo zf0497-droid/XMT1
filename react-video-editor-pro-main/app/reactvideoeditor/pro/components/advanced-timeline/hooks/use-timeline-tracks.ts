@@ -29,6 +29,8 @@ export interface UseTimelineTracksReturn {
   handleTrackReorder: (fromIndex: number, toIndex: number) => void;
   handleTrackDelete: (trackId: string) => void;
   handleToggleMagnetic: (trackId: string) => void;
+  handleToggleTrackVisible: (trackId: string) => void;
+  handleToggleTrackMuted: (trackId: string) => void;
   addNewItem: (itemData: {
     type: string;
     label?: string;
@@ -586,6 +588,29 @@ export const useTimelineTracks = ({
     });
   }, [onTracksChange]);
 
+  const handleToggleTrackVisible = useCallback((trackId: string) => {
+    setTracks((prev) => {
+      const next = prev.map((t) => {
+        if (t.id !== trackId) return t;
+        const shown = t.visible !== false;
+        return { ...t, visible: !shown };
+      });
+      onTracksChange?.(next);
+      return next;
+    });
+  }, [onTracksChange]);
+
+  const handleToggleTrackMuted = useCallback((trackId: string) => {
+    setTracks((prev) => {
+      const next = prev.map((t) => {
+        if (t.id !== trackId) return t;
+        return { ...t, muted: !t.muted };
+      });
+      onTracksChange?.(next);
+      return next;
+    });
+  }, [onTracksChange]);
+
   return {
     tracks,
     setTracks,
@@ -599,6 +624,8 @@ export const useTimelineTracks = ({
     handleTrackReorder,
     handleTrackDelete,
     handleToggleMagnetic,
+    handleToggleTrackVisible,
+    handleToggleTrackMuted,
     addNewItem,
   };
 }; 

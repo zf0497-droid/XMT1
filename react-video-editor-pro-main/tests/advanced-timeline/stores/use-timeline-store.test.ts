@@ -42,6 +42,9 @@ describe("useTimelineStore", () => {
       expect(result.current.insertionIndex).toBeNull();
       expect(result.current.magneticPreview).toBeNull();
       expect(result.current.currentDragPosition).toBeNull();
+      expect(result.current.trackReorderSourceIndex).toBeNull();
+      expect(result.current.trackReorderHoverIndex).toBeNull();
+      expect(result.current.trackReorderGapIndex).toBeNull();
     });
 
     it("should initialize newItemDragState with default values", () => {

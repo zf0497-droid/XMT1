@@ -24,6 +24,10 @@ type BaseOverlay = {
   isDragging: boolean;
   rotation: number;
   type: OverlayType;
+  /** 与所在时间轴行同步：为 true 时该行在预览与导出中均不渲染画面/不混音 */
+  timelineTrackHidden?: boolean;
+  /** 与所在时间轴行同步：为 true 时该行内视频/音频在预览与导出中静音 */
+  timelineTrackMuted?: boolean;
 };
 
 // Base style properties

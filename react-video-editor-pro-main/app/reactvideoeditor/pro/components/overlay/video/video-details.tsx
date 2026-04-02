@@ -131,7 +131,7 @@ export const VideoDetails: React.FC<VideoDetailsProps> = ({
         tabs={[
           {
             value: "settings",
-            label: t.common.settings,
+            label: t.tabs.settings,
             icon: <Settings className="w-4 h-4" />,
             content: (
               <VideoSettingsPanel
@@ -144,7 +144,7 @@ export const VideoDetails: React.FC<VideoDetailsProps> = ({
           },
           {
             value: "style",
-            label: t.common.style,
+            label: t.tabs.style,
             icon: <PaintBucket className="w-4 h-4" />,
             content: (
               <VideoStylePanel
@@ -155,7 +155,7 @@ export const VideoDetails: React.FC<VideoDetailsProps> = ({
           },
           {
             value: "ai",
-            label: "AI",
+            label: t.tabs.ai,
             icon: <Sparkles className="w-4 h-4" />,
             content: (
               <VideoAIPanel

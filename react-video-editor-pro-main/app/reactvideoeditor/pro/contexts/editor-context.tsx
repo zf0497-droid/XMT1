@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { Overlay, AspectRatio, CaptionStyles } from "../types";
+import type { RenderQualityPreset } from "../types/renderer";
 
 // Define the shape of the context
 export interface EditorContextProps {
@@ -49,7 +50,7 @@ export interface EditorContextProps {
   // Video Properties
   durationInFrames: number; // Total number of frames
   durationInSeconds: number; // Total duration in seconds
-  renderMedia: () => void; // Trigger media rendering
+  renderMedia: (qualityPreset?: RenderQualityPreset) => void | Promise<void>; // Trigger media rendering
   state: any; // General state object with proper typing
   renderState: any; // Separate render state to prevent unnecessary re-renders
 

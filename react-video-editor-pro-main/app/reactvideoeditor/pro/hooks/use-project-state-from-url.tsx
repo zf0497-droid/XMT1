@@ -1,7 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { Overlay, AspectRatio } from "../types";
-import { hasAutosave, clearAutosave } from "../utils/general/indexdb-helper";
+import {
+  hasAutosave,
+  clearAutosave,
+  loadEditorState,
+} from "../utils/general/indexdb-helper";
 import { DEFAULT_OVERLAYS } from "app/constants";
+
+/** 与编辑器 IndexedDB 键一致：URL 上的 projectId 优先，否则用默认 projectId */
+function getStorageKey(
+  paramName: string,
+  fallbackProjectId: string
+): string {
+  if (typeof window === "undefined") return fallbackProjectId;
+  const v = new URLSearchParams(window.location.search).get(paramName);
+  return v || fallbackProjectId;
+}
 
 /**
  * Custom hook to load project state (overlays) from API via URL parameter.
@@ -11,13 +25,14 @@ import { DEFAULT_OVERLAYS } from "app/constants";
  * 2. Calls the local Next.js API route: GET /api/projects?id={id}
  * 3. The local API route proxies the request to your external API
  * 4. Returns the overlays and aspect ratio to initialize the editor state
- * 5. If there's existing autosaved work, shows a confirmation modal
+ * 5. If there's existing autosaved work, shows a confirmation modal（可被「本地优先」关闭）
  *
  * ## Setup Required:
  * You need to configure your external API in your environment variables:
  * - `NEXT_PUBLIC_PROJECTS_API_URL`: Your external API endpoint
  * - `PROJECTS_API_KEY`: Your API key for authentication (kept secure server-side)
  * - `NEXT_PUBLIC_DISABLE_PROJECT_LOADING`: Set to 'true' to disable this feature
+ * - `NEXT_PUBLIC_LOCAL_SAVE_FIRST`: Set to 'true' 时：若本地 IndexedDB 已有草稿，直接使用本地并跳过远程覆盖与弹窗
  *
  * The API proxy is located at: `/app/api/projects/route.ts`
  *
@@ -62,6 +77,8 @@ export function useProjectStateFromUrl(
   showModal: boolean;
   onConfirmLoad: () => void;
   onCancelLoad: () => void;
+  /** 传给编辑器的 projectId，与 IndexedDB 键一致（URL 项目 id 优先） */
+  storageProjectId: string;
 } {
   const fallbackOverlays = DEFAULT_OVERLAYS;
   const [overlays, setOverlays] = useState<Overlay[]>(fallbackOverlays);
@@ -69,6 +86,10 @@ export function useProjectStateFromUrl(
   const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [storageProjectId, setStorageProjectId] = useState<string>(() => {
+    if (typeof window === "undefined") return projectId;
+    return getStorageKey(paramName, projectId);
+  });
 
   // Store project data when we need user confirmation
   const pendingProjectDataRef = useRef<{ overlays: Overlay[]; aspectRatio?: AspectRatio; backgroundColor?: string } | null>(null);
@@ -80,6 +101,12 @@ export function useProjectStateFromUrl(
   useEffect(() => {
     fallbackOverlaysRef.current = fallbackOverlays;
   }, [fallbackOverlays]);
+
+  // 与编辑器、IndexedDB 使用同一 project 键（SPA 内 URL 变化时更新）
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setStorageProjectId(getStorageKey(paramName, projectId));
+  }, [paramName, projectId]);
 
   useEffect(() => {
     // Only run on client-side
@@ -105,6 +132,9 @@ export function useProjectStateFromUrl(
       try {
         const searchParams = new URLSearchParams(window.location.search);
         const paramValue = searchParams.get(paramName);
+        const storageKey = paramValue || projectId;
+        const localSaveFirst =
+          process.env.NEXT_PUBLIC_LOCAL_SAVE_FIRST === "true";
 
         // No parameter in URL - use fallback
         if (!paramValue) {
@@ -114,6 +144,28 @@ export function useProjectStateFromUrl(
           setOverlays(fallbackOverlaysRef.current);
           setIsLoading(false);
           return;
+        }
+
+        // 本地优先：若 IndexedDB 已有该项目的草稿，直接恢复，不请求远程、不弹窗
+        if (localSaveFirst) {
+          const localTs = await hasAutosave(storageKey);
+          if (localTs) {
+            const localState = await loadEditorState(storageKey);
+            if (localState?.overlays && Array.isArray(localState.overlays)) {
+              console.log(
+                "[useProjectStateFromUrl] LOCAL_SAVE_FIRST: restoring from IndexedDB, skipping remote"
+              );
+              setOverlays(localState.overlays);
+              if (localState.aspectRatio) {
+                setAspectRatio(localState.aspectRatio);
+              }
+              if (localState.backgroundColor) {
+                setBackgroundColor(localState.backgroundColor);
+              }
+              setIsLoading(false);
+              return;
+            }
+          }
         }
 
         console.log(
@@ -165,8 +217,8 @@ export function useProjectStateFromUrl(
           );
         }
 
-        // Check if there's existing autosave data
-        const hasExistingAutosave = await hasAutosave(projectId);
+        // Check if there's existing autosave data（键与编辑器一致）
+        const hasExistingAutosave = await hasAutosave(storageKey);
 
         if (hasExistingAutosave) {
           // Store project data and show modal for user decision
@@ -213,7 +265,7 @@ export function useProjectStateFromUrl(
       console.log(
         "[useProjectStateFromUrl] User confirmed load, clearing autosave and loading project"
       );
-      await clearAutosave(projectId);
+      await clearAutosave(getStorageKey(paramName, projectId));
       setOverlays(pendingProjectDataRef.current.overlays);
       if (pendingProjectDataRef.current.aspectRatio) {
         setAspectRatio(pendingProjectDataRef.current.aspectRatio);
@@ -227,11 +279,25 @@ export function useProjectStateFromUrl(
   };
 
   // Handler for when user cancels and wants to keep their work
-  const onCancelLoad = () => {
+  const onCancelLoad = async () => {
     console.log(
-      "[useProjectStateFromUrl] User chose to keep existing work"
+      "[useProjectStateFromUrl] User chose to keep existing work (restore from IndexedDB)"
     );
-    setOverlays(fallbackOverlaysRef.current);
+    const key = getStorageKey(paramName, projectId);
+    try {
+      const localState = await loadEditorState(key);
+      if (localState?.overlays && Array.isArray(localState.overlays)) {
+        setOverlays(localState.overlays);
+        if (localState.aspectRatio) {
+          setAspectRatio(localState.aspectRatio);
+        }
+        if (localState.backgroundColor) {
+          setBackgroundColor(localState.backgroundColor);
+        }
+      }
+    } catch (e) {
+      console.error("[useProjectStateFromUrl] Failed to restore local state:", e);
+    }
     pendingProjectDataRef.current = null;
     setShowModal(false);
   };
@@ -244,5 +310,6 @@ export function useProjectStateFromUrl(
     showModal,
     onConfirmLoad,
     onCancelLoad,
+    storageProjectId,
   };
 }

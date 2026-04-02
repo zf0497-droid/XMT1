@@ -2,6 +2,10 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TimelineItem } from '../types';
 
+/** 轨道重排预览合并到每帧一次提交，减轻拖移迟滞 */
+let trackReorderPreviewRaf: number | null = null;
+let trackReorderPreviewPending: { hoverIndex: number; gapIndex: number } | null = null;
+
 // Type for ghost element data during drag operations
 export interface GhostInstanceData {
   id: string;
@@ -105,6 +109,11 @@ interface TimelineState {
     end: number;
     trackIndex: number;
   } | null;
+
+  /** 左侧手柄拖轨重排预览（与 React 树解耦，避免整棵 Timeline 每帧重渲染） */
+  trackReorderSourceIndex: number | null;
+  trackReorderHoverIndex: number | null;
+  trackReorderGapIndex: number | null;
 }
 
 export interface ITimelineStore extends TimelineState {
@@ -139,6 +148,10 @@ export interface ITimelineStore extends TimelineState {
   
   // Current drag position for guidelines
   setCurrentDragPosition: (position: { start: number; end: number; trackIndex: number } | null) => void;
+
+  beginTrackReorder: (sourceIndex: number) => void;
+  updateTrackReorderPreview: (hoverIndex: number, gapIndex: number) => void;
+  endTrackReorder: () => void;
   
   // Reset functions
   resetDragState: () => void;
@@ -168,6 +181,9 @@ const useTimelineStore = create<ITimelineStore>()(
       insertionIndex: null,
       magneticPreview: null,
       currentDragPosition: null,
+      trackReorderSourceIndex: null,
+      trackReorderHoverIndex: null,
+      trackReorderGapIndex: null,
 
       // Basic setters
       setGhostMarkerPosition: (position: number | null) => {
@@ -262,8 +278,57 @@ const useTimelineStore = create<ITimelineStore>()(
         set({ currentDragPosition: position });
       },
 
+      beginTrackReorder: (sourceIndex: number) => {
+        if (trackReorderPreviewRaf !== null) {
+          cancelAnimationFrame(trackReorderPreviewRaf);
+          trackReorderPreviewRaf = null;
+        }
+        trackReorderPreviewPending = null;
+        set({
+          trackReorderSourceIndex: sourceIndex,
+          trackReorderHoverIndex: sourceIndex,
+          trackReorderGapIndex: sourceIndex,
+        });
+        get().setInsertionIndex(null);
+      },
+
+      updateTrackReorderPreview: (hoverIndex: number, gapIndex: number) => {
+        trackReorderPreviewPending = { hoverIndex, gapIndex };
+        if (trackReorderPreviewRaf !== null) return;
+        trackReorderPreviewRaf = requestAnimationFrame(() => {
+          trackReorderPreviewRaf = null;
+          const pending = trackReorderPreviewPending;
+          trackReorderPreviewPending = null;
+          const src = get().trackReorderSourceIndex;
+          if (pending !== null && src !== null) {
+            set({
+              trackReorderHoverIndex: pending.hoverIndex,
+              trackReorderGapIndex: pending.gapIndex,
+            });
+          }
+        });
+      },
+
+      endTrackReorder: () => {
+        if (trackReorderPreviewRaf !== null) {
+          cancelAnimationFrame(trackReorderPreviewRaf);
+          trackReorderPreviewRaf = null;
+        }
+        trackReorderPreviewPending = null;
+        set({
+          trackReorderSourceIndex: null,
+          trackReorderHoverIndex: null,
+          trackReorderGapIndex: null,
+        });
+      },
+
       // Reset functions
       resetDragState: () => {
+        if (trackReorderPreviewRaf !== null) {
+          cancelAnimationFrame(trackReorderPreviewRaf);
+          trackReorderPreviewRaf = null;
+        }
+        trackReorderPreviewPending = null;
         set({
           draggedItem: null,
           ghostElement: null,
@@ -274,10 +339,18 @@ const useTimelineStore = create<ITimelineStore>()(
           insertionIndex: null,
           magneticPreview: null, // Clear magnetic preview
           currentDragPosition: null, // Clear current drag position
+          trackReorderSourceIndex: null,
+          trackReorderHoverIndex: null,
+          trackReorderGapIndex: null,
         });
       },
 
       clearAllState: () => {
+        if (trackReorderPreviewRaf !== null) {
+          cancelAnimationFrame(trackReorderPreviewRaf);
+          trackReorderPreviewRaf = null;
+        }
+        trackReorderPreviewPending = null;
         set({
           ghostMarkerPosition: null,
           isDragging: false,
@@ -294,6 +367,9 @@ const useTimelineStore = create<ITimelineStore>()(
           },
           livePreviewUpdates: new Map(),
           insertionIndex: null,
+          trackReorderSourceIndex: null,
+          trackReorderHoverIndex: null,
+          trackReorderGapIndex: null,
         });
       },
     }),

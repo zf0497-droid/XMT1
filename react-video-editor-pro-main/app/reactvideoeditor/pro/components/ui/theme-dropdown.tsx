@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from './button';
 import { Moon, Sun, Palette } from 'lucide-react';
 import { useExtendedThemeSwitcher, CustomTheme } from '../../hooks/use-extended-theme-switcher';
+import { t } from '../../locales';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,7 +82,7 @@ export const ThemeDropdown: React.FC<ThemeDropdownProps> = ({
           variant="ghost"
           size={size}
           className={`sm:flex border h-7 p-3 text-xs items-center gap-1 text-foreground ${className || ''}`}
-          title={`Current theme: ${currentThemeInfo?.name || displayTheme}`}
+          title={`${t.theme.currentTheme}: ${currentThemeInfo?.name || displayTheme}`}
         >
           <span className="mr-1">
             {currentThemeInfo ? getThemeDisplay(currentThemeInfo) : <Palette className="w-2.5 h-2.5" />}

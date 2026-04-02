@@ -32,16 +32,16 @@ const findThumbnailFromOverlays = (overlays: Overlay[]): string | undefined => {
 const defaultTemplates = [
   {
     "id": "example-2",
-    "name": "Sport",
-    "description": "A custom template created with React Video Editor",
+    "name": "运动风",
+    "description": "使用 React 视频编辑器创建的自定义模板",
     "createdAt": "2025-04-10T02:24:50.270Z",
     "updatedAt": "2025-04-10T02:24:50.270Z",
     "createdBy": {
       "id": "user-1",
-      "name": "User"
+      "name": "用户"
     },
-    "category": "Custom",
-    "tags": ["custom", "user-created"],
+    "category": "自定义",
+    "tags": ["自定义", "用户创建"],
     "duration": 353,
     "aspectRatio": "16:9",
     "overlays": [
@@ -145,16 +145,16 @@ const defaultTemplates = [
   },
   {
     "id": "example-3",
-    "name": "Intro Example",
-    "description": "Are you ready intro template",
+    "name": "片头示例",
+    "description": "「你准备好了吗」风格片头模板",
     "createdAt": "2025-04-09T01:45:44.752Z",
     "updatedAt": "2025-04-09T01:45:44.752Z",
     "createdBy": {
       "id": "user-1",
-      "name": "User"
+      "name": "用户"
     },
-    "category": "Custom",
-    "tags": ["Tiktok", "Ad"],
+    "category": "自定义",
+    "tags": ["抖音", "广告"],
     "duration": 86,
     "aspectRatio": "9:16",
     "overlays": [
@@ -289,16 +289,16 @@ const defaultTemplates = [
   },
   {
     id: "template-7",
-    name: "Hand Template",
-    description: "Experiment with text animation.",
+    name: "手势字模板",
+    description: "适合体验文字动画效果。",
     createdAt: "2025-04-10T00:13:34.100Z",
     updatedAt: "2025-04-10T00:13:34.100Z",
     createdBy: {
       id: "user-1",
-      name: "User",
+      name: "用户",
     },
-    category: "Custom",
-    tags: ["custom", "user-created"],
+    category: "自定义",
+    tags: ["自定义", "用户创建"],
     duration: 203,
     aspectRatio: "16:9",
     overlays: [
@@ -500,7 +500,7 @@ const defaultTemplates = [
  * Useful for providing predefined template collections
  */
 export const createStaticTemplateAdaptor = (
-  displayName: string = "Default Templates"
+  displayName: string = "默认模板"
 ): TemplateOverlayAdaptor => ({
   name: "static-templates",
   displayName,
@@ -622,7 +622,7 @@ export const createStaticTemplateAdaptor = (
  * Automatically included when no template adaptors are configured
  */
 export const defaultTemplateAdaptor =
-  createStaticTemplateAdaptor("Default Templates");
+  createStaticTemplateAdaptor("默认模板");
 
 /**
  * Helper function to get default template adaptors

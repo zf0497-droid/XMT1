@@ -34,6 +34,10 @@ export interface ReactVideoEditorProviderProps {
   
   // API Configuration
   baseUrl?: string;
+
+  /** 本地 IndexedDB 保存成功后，是否同步到你们自己的保存接口 */
+  enableRemoteSync?: boolean;
+  remoteSyncDebounceMs?: number;
   
   // NEW: Adaptor Configuration
   adaptors?: OverlayAdaptors;
@@ -102,6 +106,8 @@ export const ReactVideoEditorProvider: React.FC<ReactVideoEditorProviderProps> =
   
   // API Configuration
   baseUrl,
+  enableRemoteSync = false,
+  remoteSyncDebounceMs = 8000,
   
   // Adaptor Configuration
   adaptors,
@@ -143,7 +149,9 @@ export const ReactVideoEditorProvider: React.FC<ReactVideoEditorProviderProps> =
         } as React.CSSProperties
       }
     >
-      <RendererProvider config={{ renderer }}>
+      <RendererProvider
+        config={{ renderer, pollingInterval: 500, initialDelay: 0 }}
+      >
         <MediaAdaptorProvider adaptors={adaptors || {}}>
           <ThemeProvider config={{
             availableThemes,
@@ -165,6 +173,8 @@ export const ReactVideoEditorProvider: React.FC<ReactVideoEditorProviderProps> =
               {...(onSaved && { onSaved })}
               {...(playerRef && { playerRef })}
               {...(baseUrl !== undefined && { baseUrl })}
+              enableRemoteSync={enableRemoteSync}
+              remoteSyncDebounceMs={remoteSyncDebounceMs}
               initialRows={initialRows}
               maxRows={maxRows}
               zoomConstraints={zoomConstraints}

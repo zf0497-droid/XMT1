@@ -121,7 +121,7 @@ export const ReactVideoEditor: React.FC<ReactVideoEditorProps> = ({
       ) : (
         // Editor mode: Full editor interface with sidebar
         <>
-          {showSidebar && (customSidebar || <DefaultSidebar logo={sidebarLogo} footerText={sidebarFooterText || "RVE"} disabledPanels={disabledPanels || []} showIconTitles={showIconTitles} />)}
+          {showSidebar && (customSidebar || <DefaultSidebar logo={sidebarLogo} footerText={sidebarFooterText || "智剪PRO"} disabledPanels={disabledPanels || []} showIconTitles={showIconTitles} />)}
           <SidebarInset className={className}>
             <Editor 
               availableThemes={availableThemes}

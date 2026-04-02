@@ -1,5 +1,6 @@
 import React from "react";
 import { PaintBucket, Settings } from "lucide-react";
+import { t } from "../../../locales";
 import {
   Tabs,
   TabsContent,
@@ -134,7 +135,7 @@ export const UnifiedTabs: React.FC<UnifiedTabsProps> = (props) => {
                 value="all"
                 className="text-xs font-extralight border-b-2 border-transparent rounded-none"
               >
-                All ({totalCount})
+                {t.tabs.all} ({totalCount})
               </TabsTrigger>
             )}
 
@@ -161,13 +162,13 @@ export const UnifiedTabs: React.FC<UnifiedTabsProps> = (props) => {
     ? [
         {
           value: "settings",
-          label: "Settings",
+          label: t.tabs.settings,
           icon: <Settings className="w-3 h-3" />,
           content: props.settingsContent,
         },
         {
           value: "style", 
-          label: "Style",
+          label: t.tabs.style,
           icon: <PaintBucket className="w-3 h-3" />,
           content: props.styleContent,
         }

@@ -219,7 +219,7 @@ export const DefaultSidebar: React.FC<DefaultSidebarProps> = ({
                     {logo || (
                       <img
                         src="/icons/logo-rve.png"
-                        alt="RVE Logo"
+                        alt="智剪PRO"
                         width={27}
                         height={27}
                       />

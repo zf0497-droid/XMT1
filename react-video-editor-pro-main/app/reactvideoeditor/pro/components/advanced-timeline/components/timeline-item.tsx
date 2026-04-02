@@ -10,6 +10,7 @@ import {
   TimelineItemFadeOverlays,
 } from './timeline-item/';
 import { ContextMenu, ContextMenuTrigger } from '../../ui/context-menu';
+import { t } from '../../../locales';
 
 
 
@@ -438,8 +439,18 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
 
   // Determine context menu text based on selection
   const isMultiSelection = isSelected && selectedItemIds.length > 1;
-  const deleteText = isMultiSelection ? `Delete ${selectedItemIds.length} items` : 'Delete';
-  const duplicateText = isMultiSelection ? `Duplicate ${selectedItemIds.length} items` : 'Duplicate';
+  const deleteText = isMultiSelection
+    ? t.timeline.clipContextMenu.deleteMany.replace(
+        '{count}',
+        String(selectedItemIds.length)
+      )
+    : t.timeline.clipContextMenu.delete;
+  const duplicateText = isMultiSelection
+    ? t.timeline.clipContextMenu.duplicateMany.replace(
+        '{count}',
+        String(selectedItemIds.length)
+      )
+    : t.timeline.clipContextMenu.duplicate;
   
   // Show split option only for single items (not multi-selection) and when playhead is over the item
   const isPlayheadOverItem = currentFrame && fps ? 

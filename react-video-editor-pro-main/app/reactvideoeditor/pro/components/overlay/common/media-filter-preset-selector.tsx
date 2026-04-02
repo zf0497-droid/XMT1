@@ -2,6 +2,24 @@ import React, { useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
 import { defaultMediaFilterPresets, MediaFilterPreset } from "../../../types/media-filters";
 import { ClipOverlay, ImageOverlay } from "../../../types";
+import { t } from "../../../locales";
+
+function localizedFilterPresetName(id: string, fallback: string): string {
+  const m = t.mediaFilters;
+  const names: Record<string, string> = {
+    none: m.none,
+    vintage: m.vintage,
+    noir: m.noir,
+    retro: m.retro,
+    cool: m.cool,
+    warm: m.warm,
+    dramatic: m.dramatic,
+    soft: m.soft,
+    vibrant: m.vibrant,
+    faded: m.faded,
+  };
+  return names[id] ?? fallback;
+}
 
 interface MediaFilterPresetSelectorProps {
   localOverlay: ClipOverlay | ImageOverlay;
@@ -46,9 +64,9 @@ export const MediaFilterPresetSelector: React.FC<
   // Get the current preset name for display
   const getCurrentPresetName = (): string => {
     const currentId = getCurrentPresetId();
-    if (currentId === "custom") return "Custom";
+    if (currentId === "custom") return t.mediaFilters.custom;
     const preset = defaultMediaFilterPresets.find((p: MediaFilterPreset) => p.id === currentId);
-    return preset?.name || "None";
+    return localizedFilterPresetName(currentId, preset?.name ?? t.mediaFilters.none);
   };
 
   // When a new preset is selected, apply its filter
@@ -99,7 +117,7 @@ export const MediaFilterPresetSelector: React.FC<
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <label className="text-xs text-muted-foreground">Filter Preset</label>
+          <label className="text-xs text-muted-foreground">{t.mediaFilters.label}</label>
         </div>
       </div>
 
@@ -144,7 +162,7 @@ export const MediaFilterPresetSelector: React.FC<
                   )}
                 </div>
                 <span className="text-[10px] leading-tight text-center">
-                  {preset.name}
+                  {localizedFilterPresetName(preset.id, preset.name)}
                 </span>
               </button>
             );

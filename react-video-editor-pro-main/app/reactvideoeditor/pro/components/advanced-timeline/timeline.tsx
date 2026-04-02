@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
 import { TimelineHeader, TimelineTrackHandles, TimelineTrackGutter, TimelineHorizontalGutter, TimelineContent } from './components';
+import { TimelineTrackReorderFullWidthLine } from './components/timeline-track-reorder-full-width-line';
 import { 
   useTimelineZoom, 
   useTimelineInteractions, 
@@ -139,6 +140,8 @@ export const Timeline = forwardRef<TimelineRef, TimelineProps>(({
     handleTrackReorder,
     handleTrackDelete,
     handleToggleMagnetic,
+    handleToggleTrackVisible,
+    handleToggleTrackMuted,
     addNewItem,
   } = useTimelineTracks({ 
     initialTracks, 
@@ -209,6 +212,7 @@ export const Timeline = forwardRef<TimelineRef, TimelineProps>(({
 
   // Manage context menu state
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
+
   
   const handleContextMenuOpenChange = useCallback((isOpen: boolean) => {
     setIsContextMenuOpen(isOpen);
@@ -486,13 +490,16 @@ export const Timeline = forwardRef<TimelineRef, TimelineProps>(({
       />
       
       {/* Tracks container - flex layout with scroll */}
-      <div className="timeline-tracks-wrapper flex flex-1 overflow-hidden">
+      <div className="timeline-tracks-wrapper relative flex flex-1 overflow-hidden">
+        <TimelineTrackReorderFullWidthLine trackCount={tracks.length} />
         <div className="hidden md:block overflow-hidden">
           <TimelineTrackHandles 
             tracks={tracks} 
             onTrackReorder={handleTrackReorder}
             onTrackDelete={handleTrackDelete}
             onToggleMagnetic={handleToggleMagnetic}
+            onToggleTrackVisible={handleToggleTrackVisible}
+            onToggleTrackMuted={handleToggleTrackMuted}
             enableTrackDrag={enableTrackDrag}
             enableMagneticTrack={enableMagneticTrack}
             enableTrackDelete={enableTrackDelete}
@@ -530,6 +537,7 @@ export const Timeline = forwardRef<TimelineRef, TimelineProps>(({
             splittingEnabled={isSplittingEnabled}
             hideItemsOnDrag={effectiveHideItemsOnDrag}
             onNewItemDrop={onNewItemDrop}
+            onTrackReorder={handleTrackReorder}
           />
         </div>
       </div>

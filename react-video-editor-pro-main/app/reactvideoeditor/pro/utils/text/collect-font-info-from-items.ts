@@ -35,6 +35,10 @@ export const collectFontInfoFromOverlays = (
   const fontInfos: Record<string, FontInfo> = {};
 
   for (const overlay of overlays) {
+    if (!overlay || typeof overlay !== "object") {
+      continue;
+    }
+
     let fontFamily: string | undefined;
 
     // Extract font family based on overlay type
@@ -79,6 +83,10 @@ export const validateFontsAvailable = (overlays: Overlay[]): string[] => {
   const checkedFonts = new Set<string>();
 
   for (const overlay of overlays) {
+    if (!overlay || typeof overlay !== "object") {
+      continue;
+    }
+
     let fontFamily: string | undefined;
 
     if (isTextOverlay(overlay)) {

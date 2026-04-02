@@ -287,6 +287,9 @@ export const VideoLayerContent: React.FC<VideoLayerContentProps> = ({
 
   // Convert videoStartTime from seconds to frames for OffthreadVideo
   const startFromFrames = Math.round((overlay.videoStartTime || 0) * FPS);
+
+  const volumeFactor = overlay.timelineTrackMuted ? 0 : 1;
+  const effectiveVolume = (overlay.styles.volume ?? 1) * volumeFactor;
   
   // If greenscreen removal is enabled, use canvas-based rendering
   if (overlay.greenscreen?.enabled) {
@@ -304,7 +307,7 @@ export const VideoLayerContent: React.FC<VideoLayerContentProps> = ({
               left: 0,
               opacity: 0,
             }}
-            volume={overlay.styles.volume ?? 1}
+            volume={effectiveVolume}
             playbackRate={overlay.speed ?? 1}
           />
           {/* Canvas that displays processed video with greenscreen removed */}
@@ -331,7 +334,7 @@ export const VideoLayerContent: React.FC<VideoLayerContentProps> = ({
         src={videoSrc}
         trimBefore={startFromFrames}
         style={videoStyle}
-        volume={overlay.styles.volume ?? 1}
+        volume={effectiveVolume}
         playbackRate={overlay.speed ?? 1}
       />
     </div>

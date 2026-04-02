@@ -4,6 +4,7 @@ import { generateClipPath } from "../../../utils/crop-utils";
 import { Switch } from "../../ui/switch";
 import { Crop } from "lucide-react";
 import { Separator } from "../../ui/separator";
+import { t } from "../../../locales";
 
 
 const ASPECT_RATIOS = [
@@ -135,7 +136,7 @@ export const CropSettings: React.FC<CropSettingsProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Crop className="w-4 h-4 text-muted-foreground" />
-          <h3 className="text-xs font-extralight text-foreground">Crop</h3>
+          <h3 className="text-xs font-extralight text-foreground">{t.video.crop}</h3>
         </div>
         <Switch
           checked={isCropEnabled}
@@ -150,7 +151,7 @@ export const CropSettings: React.FC<CropSettingsProps> = ({
           <div className="space-y-3">
             <div>
               <label className="text-xs mb-2 block font-extralight text-foreground">
-                Aspect Ratios
+                {t.video.cropAspectRatios}
               </label>
               <div className="grid grid-cols-4 gap-2">
                 {ASPECT_RATIOS.map((aspectRatio) => (
@@ -158,7 +159,10 @@ export const CropSettings: React.FC<CropSettingsProps> = ({
                     key={aspectRatio.value}
                     onClick={() => handleApplyAspectRatio(aspectRatio.ratio)}
                     className="flex flex-col items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent hover:border-accent-foreground transition-colors group"
-                    title={`Apply ${aspectRatio.label} aspect ratio`}
+                    title={t.video.applyAspectRatioTitle.replace(
+                      "{ratio}",
+                      aspectRatio.label
+                    )}
                   >
                     <div
                       className="bg-muted/50 hover:bg-accent-foreground/10 transition-colors mb-1.5 border group-hover:border-accent-foreground/20 border-border"
@@ -178,13 +182,13 @@ export const CropSettings: React.FC<CropSettingsProps> = ({
 
             <div className="flex items-center justify-between ">
               <span className="text-xs text-muted-foreground font-extralight">
-                Use handles to fine-tune
+                {t.video.cropFineTune}
               </span>
               <button
                 onClick={handleClearCrop}
                 className="text-xs px-3 py-1.5 rounded-md transition-colors bg-secondary hover:bg-secondary/80 text-secondary-foreground"
               >
-                Reset
+                {t.common.reset}
               </button>
             </div>
           </div>

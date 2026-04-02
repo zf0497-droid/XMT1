@@ -2,6 +2,7 @@
 import React from 'react';
 import { ContextMenuContent, ContextMenuItem, ContextMenuSeparator } from '../../../ui/context-menu';
 import { Copy, Scissors, Trash2 } from 'lucide-react';
+import { t } from '../../../../locales';
 
 
 interface TimelineItemContextMenuProps {
@@ -44,7 +45,7 @@ export const TimelineItemContextMenu: React.FC<TimelineItemContextMenuProps> = (
           <ContextMenuSeparator />
           <ContextMenuItem onClick={onSplit}>
             <Scissors className="mr-2 h-4 w-4" />
-            <span>Split at playhead</span>
+            <span>{t.timeline.clipContextMenu.splitAtPlayhead}</span>
           </ContextMenuItem>
         </>
       )}

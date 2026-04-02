@@ -30,7 +30,7 @@ const defaultAudioTracks: StandardAudio[] = [
  * Creates a static audio adaptor from a list of audio tracks
  * Useful for providing predefined audio collections
  */
-export const createStaticAudioAdaptor = (audioList: StandardAudio[], displayName: string = 'Stock Audio'): SoundOverlayAdaptor => ({
+export const createStaticAudioAdaptor = (audioList: StandardAudio[], displayName: string = '素材音频'): SoundOverlayAdaptor => ({
   name: 'static-audio',
   displayName,
   description: 'Static collection of audio tracks',
@@ -69,7 +69,7 @@ export const createStaticAudioAdaptor = (audioList: StandardAudio[], displayName
  * Default audio adaptor with stock audio tracks
  * Automatically included when no audio adaptors are configured
  */
-export const defaultAudioAdaptor = createStaticAudioAdaptor(defaultAudioTracks, 'Default Audio');
+export const defaultAudioAdaptor = createStaticAudioAdaptor(defaultAudioTracks, '默认音频');
 
 /**
  * Helper function to get default audio adaptors

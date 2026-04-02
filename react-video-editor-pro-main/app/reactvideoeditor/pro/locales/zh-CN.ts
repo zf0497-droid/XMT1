@@ -4,6 +4,45 @@
  */
 
 export const zhCN = {
+  // 主题（浅色 / 深色 / 品牌默认）
+  theme: {
+    light: '浅色',
+    dark: '深色',
+    brandDefault: '默认',
+    currentTheme: '当前主题',
+  },
+
+  // 标签页通用文案
+  tabs: {
+    all: '全部',
+    settings: '设置',
+    style: '样式',
+    ai: '智能',
+  },
+
+  // 素材空状态、搜索提示
+  media: {
+    typeVideos: '视频',
+    typeImages: '图片',
+    typeTemplates: '模板',
+    emptySearchVideosLine1: '在上方搜索框输入关键词，查找视频素材',
+    emptySearchVideosLine2: '输入关键词后点击搜索',
+    emptySearchImagesLine1: '在上方搜索框输入关键词，查找图片素材',
+    emptySearchImagesLine2: '输入关键词后点击搜索',
+    emptySearchTemplatesLine1: '在上方搜索模板名称或关键词',
+    emptySearchTemplatesLine2: '选择模板后可应用到时间轴',
+    emptyNoAdaptor: '暂无可用的{type}素材源',
+    emptyNoResults: '未找到相关结果',
+    tryDifferentSearch: '试试更换关键词',
+  },
+
+  // 适配器在侧栏显示的名称（内置素材）
+  adaptors: {
+    defaultAudio: '默认音频',
+    defaultTemplates: '默认模板',
+    stockAudio: '素材音频',
+  },
+
   // 通用
   common: {
     save: '保存',
@@ -36,6 +75,8 @@ export const zhCN = {
     processing: '处理中...',
     clear: '清除',
     unknown: '未知',
+    padding: '内边距',
+    paddingBackground: '内边距背景',
   },
 
   // 侧边栏导航
@@ -66,6 +107,16 @@ export const zhCN = {
     renderingDisabled: '渲染功能当前已禁用',
     failedToRender: '渲染失败，请重试',
     renderError: '渲染错误',
+    qualityTitle: '选择导出画质',
+    qualityHint: '越快完成则文件略小、略省时间；越清晰则耗时更长。可按需要选择。',
+    qualityFast: '快速',
+    qualityFastDesc: '适合先看效果，耗时较短',
+    qualityBalanced: '标准',
+    qualityBalancedDesc: '速度与清晰度兼顾，推荐常用',
+    qualityHigh: '高清',
+    qualityHighDesc: '更清晰，耗时明显更长',
+    startRender: '开始导出',
+    qualityRecommended: '推荐',
   },
 
   // 设置面板
@@ -79,11 +130,17 @@ export const zhCN = {
     loadingSaves: '加载保存中...',
     noSaveHistory: '未找到保存历史',
     autosaveAppearHere: '您的自动保存项目将显示在这里',
+    colorPlaceholder: '#ffffff 或 white',
+    unknownAspect: '未知',
     aspect: '宽高比',
     time: '时间',
     actions: '操作',
     loadSave: '加载此保存',
     deleteSave: '删除此保存',
+    loadHistoryFailed: '加载保存历史失败',
+    loadSaveFailed: '加载失败',
+    deleteSaveFailed: '删除失败',
+    clearAllFailed: '清除全部失败',
   },
 
   // 时间轴
@@ -101,6 +158,18 @@ export const zhCN = {
     deleteTrack: '删除轨道',
     enableMagnetic: '启用磁性时间轴',
     disableMagnetic: '禁用磁性时间轴',
+    /** 时间轴片段右键菜单 */
+    clipContextMenu: {
+      duplicate: '复制',
+      duplicateMany: '复制 {count} 个片段',
+      delete: '删除',
+      deleteMany: '删除 {count} 个片段',
+      splitAtPlayhead: '在播放头处分割',
+    },
+    hideTrack: '隐藏轨道（含音频轨；预览与导出均不输出该轨内容）',
+    showTrack: '显示轨道',
+    muteTrack: '静音轨道（预览与导出均无此轨声音）',
+    unmuteTrack: '取消静音',
   },
 
   // 视频面板
@@ -126,6 +195,36 @@ export const zhCN = {
     searchVideos: '搜索视频',
     searchReplacement: '搜索替换视频',
     selectSpeed: '选择速度',
+    changeVideo: '更换视频',
+    previewAlt: '视频预览',
+    cropAspectRatios: '画面比例',
+    cropFineTune: '拖动画面边缘精细调整',
+    /** 占位 {ratio}，如 16:9 */
+    applyAspectRatioTitle: '应用 {ratio} 比例',
+  },
+
+  // 视频 / 图片 — AI 与绿幕（共用）
+  ai: {
+    greenScreenTitle: '绿幕抠除',
+    greenScreenDescVideo: '移除视频中的绿幕背景',
+    greenScreenDescImage: '移除图片中的绿幕背景',
+    sensitivity: '灵敏度',
+    higherGreenRemoves: '数值越高，去除绿幕越多',
+    advancedSettings: '高级设置',
+    redThreshold: '红色阈值',
+    greenMinimum: '绿色下限',
+    blueThreshold: '蓝色阈值',
+    edgeSmoothing: '边缘平滑',
+    spillRemoval: '色溢去除',
+    spillRemovalHint: '去除边缘绿色色溢',
+    autoCaptions: '自动字幕',
+    autoCaptionsDesc: '根据视频音轨使用 AI 生成字幕',
+    demoModeWarning: '未配置 AI 服务，当前为演示模式。',
+    generateCaptions: '生成字幕',
+    generating: '生成中…',
+    captionsGenerated: '字幕已生成',
+    tryAgain: '重试',
+    processingAudio: '正在处理音频…',
   },
 
   // 文字面板
@@ -224,6 +323,8 @@ export const zhCN = {
     myImages: '我的图片',
     searchImages: '搜索图片',
     searchReplacement: '搜索替换图片',
+    changeImage: '更换图片',
+    previewAlt: '图片预览',
   },
 
   // 贴纸面板
@@ -233,6 +334,11 @@ export const zhCN = {
     stickerSettings: '贴纸设置',
     stickerDetails: '贴纸详情',
     selectSticker: '选择贴纸',
+    categoryDefault: '默认',
+    categoryEmojis: '表情',
+    categoryShapes: '形状',
+    settingsComingTitle: '贴纸设置',
+    settingsComingDesc: '后续将支持在此处自定义贴纸相关设置。',
   },
 
   // 上传面板
@@ -272,6 +378,47 @@ export const zhCN = {
     noAnimation: '无动画',
     enterAnimations: '入场动画',
     exitAnimations: '出场动画',
+    /** 与 default-animation-adaptors 中 key 一致 */
+    presetNames: {
+      none: '无',
+      fade: '淡入淡出',
+      scale: '缩放',
+      bounce: '弹跳',
+      flip: '翻转 X',
+      'zoom-blur': '缩放模糊',
+      'slide-up': '自下而上',
+      'snap-rotate': '快速旋转',
+      glitch: '故障',
+      'swipe-reveal': '划开',
+      'float-in': '漂浮',
+      spin: '旋转',
+      'slide-down': '自上而下',
+      'slide-left': '自左而入',
+      'diagonal-slide': '斜向滑入',
+      wobble: '摇摆',
+      'flip-y': '翻转 Y',
+      pulse: '脉冲',
+      drop: '下落',
+      squeeze: '挤压',
+      roll: '滚动',
+      swing: '摆动',
+      'expand-vertical': '纵向展开',
+      'expand-horizontal': '横向展开',
+      twist: '扭动',
+      blur: '模糊',
+      spiral: '螺旋',
+      shake: '抖动',
+      curtain: '幕布',
+      fold: '折叠',
+      zigzag: '之字',
+      elastic: '弹性',
+      slingshot: '弹射',
+      'rotate-in': '旋转入场',
+      skew: '倾斜',
+      peek: '窥入',
+      vortex: '漩涡',
+      typing: '打字机',
+    },
   },
 
   // 位置设置
@@ -310,6 +457,34 @@ export const zhCN = {
     selectFit: '选择适应方式',
     layout3DEffects: '3D 布局效果',
     no3DEffect: '无 3D 效果',
+    /** 与 default-3d-layout-adaptors 中 layout.key 一致 */
+    layout3DPresetNames: {
+      none: '无',
+      'tilt-up': '上倾',
+      'tilt-down': '下倾',
+      'card-left': '左侧',
+      'card-right': '右侧',
+      book: '书本',
+      floating: '悬浮',
+      billboard: '看板',
+      skewed: '倾斜',
+    },
+  },
+
+  // 素材滤镜预设（下拉与网格）
+  mediaFilters: {
+    label: '滤镜预设',
+    custom: '自定义',
+    none: '无',
+    vintage: '复古',
+    noir: '黑白电影',
+    retro: '怀旧',
+    cool: '冷色',
+    warm: '暖色',
+    dramatic: '戏剧',
+    soft: '柔和',
+    vibrant: '鲜艳',
+    faded: '褪色',
   },
 
   // 滤镜
@@ -359,8 +534,8 @@ export const zhCN = {
   // 移动端提示
   mobile: {
     hello: '你好 👋',
-    desktopExperience: 'React Video Editor 在桌面端体验最佳。',
-    mobileUsage: '您仍然可以在移动设备上使用，但我们为了更简洁的界面减少了一些功能。请注意，性能取决于您的移动浏览器的能力。',
+    desktopExperience: '智剪PRO 在桌面端使用体验最佳。',
+    mobileUsage: '您仍可在手机或平板上使用，但界面为简化版，部分功能可能不可用。实际效果取决于浏览器性能。',
     continue: '知道了，继续！',
     noShowAgain: '此消息不会再次显示',
   },
@@ -381,6 +556,9 @@ export const zhCN = {
     dragToReorder: '拖拽以重新排序',
     clickToEdit: '点击编辑',
     doubleClickToEdit: '双击编辑',
+    /** 说明：浏览器默认右键菜单无法被网页改为中文 */
+    browserContextMenuNote:
+      '在页面空白处或浏览器界面右键时，出现的「后退、前进、刷新、撤销、剪切、复制、全选、检查」等菜单由浏览器或系统提供，网页应用无法改为中文。时间轴片段上的右键菜单已在应用内显示中文。',
   },
 };
 

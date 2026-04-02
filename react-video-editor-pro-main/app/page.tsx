@@ -14,21 +14,26 @@ import { useProjectStateFromUrl } from './reactvideoeditor/pro/hooks/use-project
 
 export default function SimplePage() {
   /**
-   * A project ID represents a unique editing session or workspace for a user.
-   * This must match the composition ID defined in the Remotion bundle.
+   * 默认工程键（无 ?projectId= 时使用）。Remotion 成片用的 Composition id 在 constants 的 COMP_NAME，
+   * 与本地/远程「项目 id」分离，避免 URL 项目 UUID 破坏导出。
    */
-  const PROJECT_ID = "TestComponent";
+  const DEFAULT_STORAGE_PROJECT_ID = "TestComponent";
 
   /**
    * Load project state from API via URL parameter.
-   * Landing site saves project: overlays sent to API
-   * Then navigates to: /editor?projectId=456
-   * 
-   * This hook fetches the project state and returns overlays, aspect ratio, and loading state.
-   * If there's existing autosave data, user will be prompted via modal to choose.
+   * 有 ?projectId= 时，IndexedDB 与远程保存均使用该 id 作为工程键。
+   * NEXT_PUBLIC_LOCAL_SAVE_FIRST=true 时优先恢复本地草稿。
    */
-  const { overlays, aspectRatio, backgroundColor, isLoading, showModal, onConfirmLoad, onCancelLoad } = 
-    useProjectStateFromUrl('projectId', PROJECT_ID);
+  const {
+    overlays,
+    aspectRatio,
+    backgroundColor,
+    isLoading,
+    showModal,
+    onConfirmLoad,
+    onCancelLoad,
+    storageProjectId,
+  } = useProjectStateFromUrl("projectId", DEFAULT_STORAGE_PROJECT_ID);
 
   // Handle theme changes
   const handleThemeChange = (themeId: string) => {
@@ -40,7 +45,7 @@ export default function SimplePage() {
     const availableThemes: CustomTheme[] = [
       {
         id: 'rve',
-        name: 'RVE',
+        name: '默认',
         className: 'rve',
         color: '#3E8AF5'
       },
@@ -71,13 +76,17 @@ export default function SimplePage() {
         onCancel={onCancelLoad}
       />
       <ReactVideoEditor
-        projectId={PROJECT_ID}
+        projectId={storageProjectId}
         defaultOverlays={overlays as any}
         defaultAspectRatio={aspectRatio || undefined}
         defaultBackgroundColor={backgroundColor || undefined}
         isLoadingProject={isLoading}
         fps={30}
         renderer={ssrRenderer}
+        enableRemoteSync={
+          process.env.NEXT_PUBLIC_ENABLE_REMOTE_PROJECT_SYNC === "true"
+        }
+        remoteSyncDebounceMs={8000}
         disabledPanels={[]}
         availableThemes={availableThemes}
         defaultTheme="dark"

@@ -173,4 +173,6 @@ export interface TimelineContentProps {
   splittingEnabled?: boolean; // Whether splitting mode is enabled
   // Hide items during drag
   hideItemsOnDrag?: boolean; // Whether to hide selected timeline items during drag operations (default: false)
+  /** 轨道重排完成回调（预览状态在 useTimelineStore） */
+  onTrackReorder?: (fromIndex: number, toIndex: number) => void;
 } 

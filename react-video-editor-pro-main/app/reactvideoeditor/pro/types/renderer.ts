@@ -4,6 +4,9 @@ import { CompositionProps, type ProgressResponse as BaseProgressResponse } from 
 // Re-export ProgressResponse for consistency
 export type ProgressResponse = BaseProgressResponse;
 
+/** 导出成片画质（由用户在界面选择，传给服务端） */
+export type RenderQualityPreset = "fast" | "balanced" | "high";
+
 /**
  * Response from initiating a render
  */
@@ -18,6 +21,8 @@ export interface RenderResponse {
 export interface RenderParams {
   id: string;
   inputProps: z.infer<typeof CompositionProps>;
+  /** 可选；未传时服务端按「标准」处理 */
+  qualityPreset?: RenderQualityPreset;
 }
 
 /**

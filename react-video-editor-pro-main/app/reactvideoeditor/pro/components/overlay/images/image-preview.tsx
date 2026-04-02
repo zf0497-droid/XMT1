@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { ImageOverlay } from "../../../types";
 import { RefreshCw } from "lucide-react";
 import { Button } from "../../ui/button";
+import { t } from "../../../locales";
 
 
 interface ImagePreviewProps {
@@ -45,7 +46,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     >
       <img
         src={overlay.src}
-        alt="Image preview"
+        alt={t.image.previewAlt}
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           filter: overlay.styles?.filter || 'none',
@@ -67,7 +68,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
             size="sm"
           >
             <RefreshCw className="w-3 h-3" />
-            Change Image
+            {t.image.changeImage}
           </Button>
         </div>
       )}
