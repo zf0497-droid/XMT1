@@ -54,13 +54,11 @@ const nextConfig = {
 
     return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: [
-      "@remotion/bundler",
-      "@remotion/renderer",
-      "esbuild",
-    ],
-  },
+  serverExternalPackages: [
+    "@remotion/bundler",
+    "@remotion/renderer",
+    "esbuild",
+  ],
 };
 
 // Only wrap with Sentry config if Sentry is enabled

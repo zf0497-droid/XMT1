@@ -21,7 +21,8 @@ import {
   RectangleVertical,
 } from 'lucide-react';
 import { Button } from '../../../ui/button';
-import type { AspectRatio } from '../../../../types';
+import type { AspectRatio, KnownAspectRatio } from '../../../../types';
+import { ASPECT_RATIO_PRESETS } from '../../../../utils/aspect-ratio-transform';
 import { t } from '../../../../locales';
 
 interface AspectRatioDropdownProps {
@@ -35,50 +36,30 @@ interface AspectRatioDropdownProps {
   className?: string;
 }
 
-// 顺序：常见横屏 → 标准横屏 → 方 → 竖版社交 → 竖屏全屏 → 标准竖屏
-const ASPECT_RATIO_OPTIONS: Array<{
-  value: AspectRatio;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-}> = [
-  {
-    value: '16:9',
-    label: '16:9',
-    icon: Monitor,
-    color: 'text-blue-500',
-  },
-  {
-    value: '4:3',
-    label: '4:3',
-    icon: Tv,
-    color: 'text-cyan-500',
-  },
-  {
-    value: '1:1',
-    label: '1:1',
-    icon: Square,
-    color: 'text-green-500',
-  },
-  {
-    value: '4:5',
-    label: '4:5',
-    icon: Instagram,
-    color: 'text-pink-500',
-  },
-  {
-    value: '9:16',
-    label: '9:16',
-    icon: Smartphone,
-    color: 'text-purple-500',
-  },
-  {
-    value: '3:4',
-    label: '3:4',
-    icon: RectangleVertical,
-    color: 'text-amber-500',
-  },
-];
+/** 图标与颜色：仅针对 KnownAspectRatio；新增预设须在此补一项 */
+const ASPECT_RATIO_UI: Record<
+  KnownAspectRatio,
+  { icon: React.ComponentType<{ className?: string }>; color: string }
+> = {
+  '16:9': { icon: Monitor, color: 'text-blue-500' },
+  '4:3': { icon: Tv, color: 'text-cyan-500' },
+  '1:1': { icon: Square, color: 'text-green-500' },
+  '4:5': { icon: Instagram, color: 'text-pink-500' },
+  '9:16': { icon: Smartphone, color: 'text-purple-500' },
+  '3:4': { icon: RectangleVertical, color: 'text-amber-500' },
+};
+
+const ASPECT_RATIO_OPTIONS = ASPECT_RATIO_PRESETS.map((p) => {
+  const ui = ASPECT_RATIO_UI[p.id];
+  return {
+    value: p.id as AspectRatio,
+    label: p.id,
+    icon: ui.icon,
+    color: ui.color,
+  };
+});
+
+const desc = t.canvasAspectRatio.description as Record<string, string>;
 
 export const AspectRatioDropdown: React.FC<AspectRatioDropdownProps> = ({
   aspectRatio,
@@ -158,7 +139,7 @@ export const AspectRatioDropdown: React.FC<AspectRatioDropdownProps> = ({
                     )}
                   </div>
                   <span className="text-xs text-muted-foreground font-extralight">
-                    {t.canvasAspectRatio.description[option.value]}
+                    {desc[option.value] ?? `比例 ${option.value}`}
                   </span>
                 </div>
               </DropdownMenuRadioItem>

@@ -18,8 +18,8 @@ import { getBaseUrl } from "../../../../reactvideoeditor/pro/utils/general/url-h
 import {
   normalizeDimensionsForVideoEncode,
   getDimensionsForAspectRatio,
+  parseAspectRatioString,
 } from "../../../../reactvideoeditor/pro/utils/aspect-ratio-transform";
-import type { AspectRatio } from "../../../../reactvideoeditor/pro/types";
 import type { RenderQualityPreset } from "../../../../reactvideoeditor/pro/types/renderer";
 import type { X264Preset } from "@remotion/renderer";
 
@@ -172,26 +172,16 @@ export async function startRendering(
       const rawW = Number(raw.width);
       const rawH = Number(raw.height);
       const arRaw = raw.aspectRatio;
-      const aspectRatio =
-        typeof arRaw === "string" ? (arRaw as AspectRatio) : undefined;
-      const allowed: AspectRatio[] = [
-        "16:9",
-        "4:3",
-        "1:1",
-        "4:5",
-        "9:16",
-        "3:4",
-      ];
-      const safeAspect =
-        aspectRatio && allowed.includes(aspectRatio) ? aspectRatio : undefined;
+      const aspectKey =
+        typeof arRaw === "string" ? arRaw.trim() : "";
 
       let baseW =
         Number.isFinite(rawW) && rawW > 0 ? rawW : Number.NaN;
       let baseH =
         Number.isFinite(rawH) && rawH > 0 ? rawH : Number.NaN;
       if (!Number.isFinite(baseW) || !Number.isFinite(baseH)) {
-        if (safeAspect) {
-          const d = getDimensionsForAspectRatio(safeAspect);
+        if (aspectKey && parseAspectRatioString(aspectKey)) {
+          const d = getDimensionsForAspectRatio(aspectKey);
           baseW = d.width;
           baseH = d.height;
         } else {

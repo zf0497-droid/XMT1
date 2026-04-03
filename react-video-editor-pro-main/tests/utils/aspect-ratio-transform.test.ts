@@ -4,6 +4,7 @@ import {
   shouldTransformOverlays,
   getDimensionsForAspectRatio,
   normalizeDimensionsForVideoEncode,
+  parseAspectRatioString,
   CanvasDimensions,
 } from "../../app/reactvideoeditor/pro/utils/aspect-ratio-transform";
 import { Overlay, OverlayType } from "../../app/reactvideoeditor/pro/types";
@@ -50,6 +51,30 @@ describe("aspect-ratio-transform", () => {
         width: 1080,
         height: 1440,
       });
+    });
+
+    it("derives dimensions for unknown ratios via long-edge algorithm (21:9)", () => {
+      expect(getDimensionsForAspectRatio("21:9")).toEqual(
+        normalizeDimensionsForVideoEncode(1920, Math.round((1920 * 9) / 21))
+      );
+    });
+
+    it("falls back to 16:9 pixels for invalid ratio strings", () => {
+      expect(getDimensionsForAspectRatio("not-a-ratio")).toEqual({
+        width: 1280,
+        height: 720,
+      });
+    });
+  });
+
+  describe("parseAspectRatioString", () => {
+    it("parses spaced colons", () => {
+      expect(parseAspectRatioString(" 16 : 9 ")).toEqual({ w: 16, h: 9 });
+    });
+
+    it("rejects zero parts", () => {
+      expect(parseAspectRatioString("0:9")).toBeNull();
+      expect(parseAspectRatioString("9:0")).toBeNull();
     });
   });
 

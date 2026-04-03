@@ -1,3 +1,5 @@
+import type { AspectRatio, KnownAspectRatio } from "../utils/aspect-ratio-dimensions";
+
 // Define overlay types enum
 export enum OverlayType {
   TEXT = "text",
@@ -341,14 +343,8 @@ export type SelectedItem = TimelineItemUnion | null;
 
 // Zod schema for composition props
 
-const aspectRatioEnum = z.enum([
-  "16:9",
-  "4:3",
-  "1:1",
-  "4:5",
-  "9:16",
-  "3:4",
-]);
+/** 与 ASPECT_RATIO_PRESETS / 算法一致：任意「正整数:正整数」 */
+const aspectRatioSchema = z.string().regex(/^\d+:\d+$/);
 
 export const CompositionProps = z.object({
   overlays: z.array(z.any()), // Replace with your actual Overlay type
@@ -358,7 +354,7 @@ export const CompositionProps = z.object({
   fps: z.number(),
   src: z.string(),
   /** 与当前画布比例一致；服务端在宽高异常时可据此回退 */
-  aspectRatio: aspectRatioEnum.optional(),
+  aspectRatio: aspectRatioSchema.optional(),
   /** 与编辑器画布一致，导出时传给 Remotion Main */
   backgroundColor: z.string().optional(),
   fontInfos: z.record(z.any()).optional(),
@@ -412,7 +408,7 @@ export type LocalClip = {
   videoUrl: string;
 };
 
-export type AspectRatio = "16:9" | "4:3" | "1:1" | "4:5" | "9:16" | "3:4";
+export type { AspectRatio, KnownAspectRatio };
 
 export interface TimelineRow {
   id: number;

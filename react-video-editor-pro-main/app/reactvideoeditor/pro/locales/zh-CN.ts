@@ -500,10 +500,9 @@ export const zhCN = {
     hueRotate: '色相旋转',
   },
 
-  // 画布比例下拉（时间轴头部，与 AspectRatio 类型一一对应）
+  // 画布比例下拉（与 ASPECT_RATIO_PRESETS 的 id 对应；未列出的键会用「比例 x:y」回退）
   canvasAspectRatio: {
     title: '画面比例',
-    /** value 为 AspectRatio 字符串 */
     description: {
       '16:9': '横屏宽屏',
       '4:3': '标准横屏',
@@ -511,10 +510,7 @@ export const zhCN = {
       '4:5': '竖版（4:5）',
       '9:16': '竖屏全屏',
       '3:4': '标准竖屏',
-    } as Record<
-      '16:9' | '4:3' | '1:1' | '4:5' | '9:16' | '3:4',
-      string
-    >,
+    } as Record<string, string>,
   },
 
   // 错误消息
